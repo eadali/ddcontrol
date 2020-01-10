@@ -7,7 +7,9 @@ A proportional–integral–derivative controller (PID controller or three-term 
 is a control loop mechanism employing feedback that is widely used inindustrial control systems
 and a variety of other applications requiring continuously modulated control.::
 
-sdfasfd
+```python
+class ddc.PIDController(kp, ki, kd, nn, lmin=-inf, lmax=+inf):
+```
 
 ## Roadmap
 - Real time PID controller tuning
