@@ -1,17 +1,18 @@
 # Data-Driven Control
-The design of the controller are based entirely on experimental data collected from the plant
+The design of the controller are based entirely on experimental data collected from the plant.
 
-# Simple Example
+## Simple Example
 ```python
-#Tuning start time
-start = 4.0 #sec
-#Tuning end time
-end = 8.0 #sec
-#Reference
-ref = 50.0
+from ddc import PIDContoller, PIDTuner
+from time import time
 
-pid = PIDController(kp=1.0, ki=1.0, kd=1.0, nn=1.0)
-tuner = PIDTuner(controller=pid, gain=1.0, init_freq=1.0)
+start, end = 4.0, 8.0 #Tuning start time[sec], Tuning end time[sec]
+ref = 50.0 #Reference value for controller
+kp, kd, ki, nn = 0.0, 0.0, 0.0, 0.0 #Initial PID gains
+amp = 1.0, init_freq=1.0 #Identification sin amplitude, Initial freq for identificaion sin
+
+pid = PIDController(kp, ki, kd, nn)
+tuner = PIDTuner(pid, amp, init_freq)
 
 timer_start = time()
 while True:
