@@ -10,7 +10,7 @@ and a variety of other applications requiring continuously modulated control.::
 ```python
 class ddc.PIDController(kp, ki, kd, nn, lmin=-inf, lmax=+inf):
 ```
-
+$e^{i \pi} = -1$
 ## Roadmap
 - Real time PID controller tuning
 - Real time frequency response analysis
