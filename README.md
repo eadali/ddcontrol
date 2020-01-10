@@ -14,6 +14,6 @@ class ddc.PIDController(kp, ki, kd, nn, lmin=-inf, lmax=+inf):
 <img src="https://latex.codecogs.com/gif.latex?\delta(t)&space;=&space;N&space;(K_d&space;e(t)-\int_{0}^{t}&space;\delta(t))" title="\delta(t) = N (K_d e(t)-\int_{0}^{t} \delta(t))" />
 
 ## Roadmap
-Real time PID controller tuning
-Real time frequency response analysis
-Implementation of state observer
+- Real time PID controller tuning
+- Real time frequency response analysis
+- Implementation of state observer
