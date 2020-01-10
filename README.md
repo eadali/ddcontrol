@@ -1,5 +1,5 @@
-# ddc
-Data-Driven Control
+# Data-Driven Control
+The design of the controller are based entirely on experimental data collected from the plant
 
-# PID controller
-auto-tuning
+## PID controller
+PID contoller

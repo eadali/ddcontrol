@@ -8,7 +8,6 @@ Created on Thu Jan  9 20:18:58 2020
 from numpy import clip, inf
 from time import time
 from scipy.optimize import minimize
-from
 
 
 
@@ -40,7 +39,7 @@ class Integral:
 
 
 class PIDController:
-    def __init__(self, kp=0.0, ki=0.0, kd=0.0, nn=0.0, lmin=-inf, lmax=+inf):
+    def __init__(self, kp, ki, kd, nn, lmin=-inf, lmax=+inf):
         """Inits PIDContoller parameters
         # Arguments
             kp: Proportional gain
@@ -83,41 +82,41 @@ class PIDController:
         self.filt_int.update(u_deriv)
         # Calculates output
         u_sum = u_prop + u_int + u_deriv
-        u_control = clip(u_sum, self.min, self.max)
+        u_control = clip(u_sum, self.lmin, self.lmax)
         return u_control
 
 
-class PIDTuner:
-    def __init__(self, controller, tbandwidth, tphasemargin, ptype, psign, amp):
-        self.controller = controller
-        self.tbandwidth = tbandwidth
-        self.tphasemargin = tphasemargin
-        self.ptype = ptype
-        self.psign = psign
+#class PIDTuner:
+#    def __init__(self, controller, tbandwidth, tphasemargin, ptype, psign, amp):
+#        self.controller = controller
+#        self.tbandwidth = tbandwidth
+#        self.tphasemargin = tphasemargin
+#        self.ptype = ptype
+#        self.psign = psign
+#
+#
+#    def update(self, err, y_meas, tune=False):
+#        angle = asarray([1.0/16.0, 1.0/4.0, 1.0, 4.0, 16.0]) * self.tbandwidth
+#        disturb = amp * sin(angle).sum()
+#
+#
+#        angle[1/16]
+#        u_control = self.controller.update(err)
+#        return u_control
 
 
-    def update(self, err, y_meas, tune=False):
-        angle = asarray([1.0/16.0, 1.0/4.0, 1.0, 4.0, 16.0]) * self.tbandwidth
-        disturb = amp * sin(angle).sum()
-
-
-        angle[1/16]
-        u_control = self.controller.update(err)
-        return u_control
-
-
-class FFTResponse:
-    def __init__(self, fmin, fmax, num):
-        freq = linspace(fmin, fmax, num)
-        # Previously measured time
-        self.ttime_start = None
-
-    def update(self, y_meas, u_cont):
-        ttime = 0.0
-        if self.ttime_start is not None:
-            ttime = time() - self.ttime_start
-
-        u_control = sin(freq*)
+#class FFTResponse:
+#    def __init__(self, fmin, fmax, num):
+#        freq = linspace(fmin, fmax, num)
+#        # Previously measured time
+#        self.ttime_start = None
+#
+#    def update(self, y_meas, u_cont):
+#        ttime = 0.0
+#        if self.ttime_start is not None:
+#            ttime = time() - self.ttime_start
+#
+#        u_control = sin(freq*)
 
 
 
