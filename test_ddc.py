@@ -52,7 +52,7 @@ def test_PIDController():
     """Test of PIDController
     """
     mdl = Model(2.0, [1.0,1.0])
-    pid = PIDController(2.0, 0.0, 4.0, 1.0)
+    pid = PIDController(0.0, 0.0, -1.0, 1000.0)
     y = zeros(400)
     u_control = 0.0
     u = zeros(400) ##TODO: delete this line
@@ -62,19 +62,24 @@ def test_PIDController():
         u[index] = u_control ##TODO:delete this line
 
     ## TODO: delete these lines
+    from numpy import diff
     from matplotlib import pyplot
     pyplot.subplot(2,1,1)
     pyplot.plot(y)
-    pyplot.subplot(2,1,2)
     pyplot.plot(u)
+    pyplot.subplot(2,1,2)
+#    pyplot.plot(diff(y), 'r')
     pyplot.show()
     #############################
 
     assert (absolute(y)<0.04).all()
 
+
 def test_PIDTuner():
     ## TODO: implement this funciton
-    assert True
+    assert False
+
 
 def test_FrequencyResponse():
     ## TODO: implement this function
+    assert False
