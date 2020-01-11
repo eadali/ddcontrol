@@ -39,7 +39,7 @@ class Integral:
 
 
 class PIDController:
-    def __init__(self, kp, ki, kd, nn, lmin=-inf, lmax=+inf):
+    def __init__(self, kp, ki, kd, kn, lmin=-inf, lmax=+inf):
         """Inits PIDContoller parameters
         # Arguments
             kp: Proportional gain
@@ -50,7 +50,7 @@ class PIDController:
         self.kp = kp
         self.ki = ki
         self.kd = kd
-        self.nn = nn
+        self.kn = kn
         self.lmin = lmin
         self.lmax = lmax
 
@@ -78,7 +78,7 @@ class PIDController:
         else:
             u_int = self.int.update(self.ki*err)
         # Calculates derivative term
-        u_deriv = self.nn * (self.kd*err-self.filt_int.state)
+        u_deriv = self.kn * (self.kd*err-self.filt_int.state)
         self.filt_int.update(u_deriv)
         # Calculates output
         u_sum = u_prop + u_int + u_deriv

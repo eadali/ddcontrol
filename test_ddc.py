@@ -40,12 +40,67 @@ def test_Integral():
     sequence = asarray([0.0,1.0,1.0,1.0,1.0])
     result = zeros(sequence.shape)
     expected = cumsum(sequence)
-    integ = Integral()
+    integral = Integral()
     for index in range(sequence.shape[0]):
-        result[index] = integ.update(sequence[index])
+        result[index] = integral.update(sequence[index])
         sleep(1)
 
     assert absolute(result-expected).sum() < 0.02
+
+
+def test_PIDController_P():
+    """Test of PIDController P gain
+    """
+    pid = PIDController(1.0, 0.0, 0.0, 0.0)
+    err = asarray([0.0, 2.0, 4.0, 8.0])
+    u_cont = zeros(err.shape)
+    expected = asarray([0.0, 2.0, 4.0, 8.0])
+    for index in range(err.shape[0]):
+        u_cont[index] = pid.update(err[index])
+
+    assert absolute(expected-u_cont).sum() < 0.0001
+
+
+def test_PIDController_I():
+    """Test of PIDController I gain
+    """
+    pid = PIDController(0.0, 1.0, 0.0, 0.0)
+    err = asarray([0.0, 2.0, 4.0, 8.0])
+    u_cont = zeros(err.shape)
+    expected = asarray([0.0, 0.2, 0.6, 1.4])
+    for index in range(err.shape[0]):
+        u_cont[index] = pid.update(err[index])
+        sleep(0.1)
+
+    assert absolute(expected-u_cont).sum() < 0.01
+
+
+def test_PIDController_D():
+    """Test of PIDController D gain
+    """
+    pid = PIDController(0.0, 0.0, 1000000.0, 0.000001)
+    err = asarray([0.0, 2.0, 4.0, 8.0])
+    u_cont = zeros(err.shape)
+    expected = asarray([0.0, 2.0, 4.0, 8.0])
+    for index in range(err.shape[0]):
+        u_cont[index] = pid.update(err[index])
+        sleep(0.1)
+
+    assert absolute(expected-u_cont).sum() < 0.01
+
+
+def test_PIDController_N():
+    """Test of PIDController N gain
+    """
+    pid = PIDController(0.0, 0.0, 0.000001, 1.0)
+    err = asarray([0.0, 2.0, 4.0, 8.0])
+    u_cont = zeros(err.shape)
+    expected = asarray([0.0, 0.0, 0.0, 0.0])
+    for index in range(err.shape[0]):
+        u_cont[index] = pid.update(err[index])
+        sleep(0.1)
+
+    assert absolute(expected-u_cont).sum() < 0.01
 
 
 def test_PIDController():
@@ -73,13 +128,13 @@ def test_PIDController():
     #############################
 
     assert (absolute(y)<0.04).all()
-
-
-def test_PIDTuner():
-    ## TODO: implement this funciton
-    assert False
-
-
-def test_FrequencyResponse():
-    ## TODO: implement this function
-    assert False
+#
+#
+#def test_PIDTuner():
+#    ## TODO: implement this funciton
+#    assert False
+#
+#
+#def test_FrequencyResponse():
+#    ## TODO: implement this function
+#    assert False
