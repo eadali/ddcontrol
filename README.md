@@ -27,17 +27,17 @@ and a variety of other applications requiring continuously modulated control[wik
 ```python
 class ddc.PIDController(kp, ki, kd, kn, freq=10, lmin=-inf, lmax=+inf):
 ```
-Mathematical control function:
+Mathematical control function:  
 <img src="https://latex.codecogs.com/gif.latex?u(t)&space;=&space;K_p&space;e(t)&space;&plus;&space;K_i&space;\int_{0}^{t}&space;e(t)&space;&plus;&space;\delta(t)" title="u(t) = K_p e(t) + K_i \int_{0}^{t} e(t) + \delta(t)" />
 <img src="https://latex.codecogs.com/gif.latex?\delta(t)&space;=&space;N&space;(K_d&space;e(t)-\int_{0}^{t}&space;\delta(t))" title="\delta(t) = N (K_d e(t)-\int_{0}^{t} \delta(t))" />
-
-kp : Proportional gain of controller
-ki : Integral gain of controller
-kd : Derivative gain of controller
-kn : Derivative filter gain of controller
-freq : Frequency for controller
-lmin : Lower limit for controller output
-lmax : Higher limit for controller output
+  
+kp : Proportional gain of controller  
+ki : Integral gain of controller  
+kd : Derivative gain of controller  
+kn : Derivative filter gain of controller  
+freq : Frequency for controller  
+lmin : Lower limit for controller output  
+lmax : Higher limit for controller output  
 
 ## Roadmap
 - Real time PID controller tuning
