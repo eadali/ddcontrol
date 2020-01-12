@@ -32,16 +32,22 @@ Mathematical control function:
 **Parameters**  
 **kp : float**  
 &nbsp;Proportional gain of controller  
+
 **ki : float**  
 &nbsp;Integral gain of controller  
+
 **kd : float**  
 &nbsp;Derivative gain of controller  
+
 **kn : float**  
 &nbsp;Derivative filter gain of controller  
+
 **freq : float (default=10)**  
 &nbsp;Frequency for controller  
+
 **lmin : float (default=numpy.inf)**  
 &nbsp;Lower limit for controller output  
+
 **lmax : float (default=-numpy.inf)**  
 &nbsp;Higher limit for controller output  
 
