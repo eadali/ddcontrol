@@ -32,19 +32,19 @@ Mathematical control function:
 <img src="https://latex.codecogs.com/gif.latex?\delta(t)&space;=&space;N&space;(K_d&space;e(t)-\int_{0}^{t}&space;\delta(t))" title="\delta(t) = N (K_d e(t)-\int_{0}^{t} \delta(t))" />
   
 **kp : float**  
- Proportional gain of controller  
+&nbsp;Proportional gain of controller  
 **ki : float**  
- Integral gain of controller  
+&nbsp;Integral gain of controller  
 **kd : float**  
- Derivative gain of controller  
+&nbsp;Derivative gain of controller  
 **kn : float**  
- Derivative filter gain of controller  
+&nbsp;Derivative filter gain of controller  
 **freq : float (default=10)**  
- Frequency for controller  
+&nbsp;Frequency for controller  
 **lmin : float (default=numpy.inf)**  
- Lower limit for controller output  
+&nbsp;Lower limit for controller output  
 **lmax : float (default=-numpy.inf)**  
- Higher limit for controller output  
+&nbsp;Higher limit for controller output  
 
 ## Roadmap
 - Real time PID controller tuning
