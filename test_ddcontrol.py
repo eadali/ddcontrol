@@ -6,7 +6,7 @@ Created on Fri Jan 10 19:56:26 2020
 @author: eadali
 """
 
-from ddcontrol import PIDController
+from ddcontrol import PIDController, PIDTuner
 from numpy import asarray, zeros, absolute, sin
 from time import time
 from scipy.integrate import odeint
@@ -113,3 +113,13 @@ def test_PIDController():
         y[index] = mdl.update(u_control)
         u_control = pid.update(-y[index])
     assert (absolute(y[-10:]) < 0.04).all()
+
+
+def test_PIDTuner():
+    tuner = PIDTuner(PIDController(8.0, 0.01, 0.8, 10.0), 0.1, 100)
+    mdl = IPModel(0.4, 5.0, [0.5, 0.0])
+    y = zeros(100)
+    u_control = 0.0
+    for index in range(y.shape[0]):
+        y[index] = mdl.update(u_control)
+        u_control = pid.update(-y[index])
