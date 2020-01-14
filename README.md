@@ -3,7 +3,7 @@ The design of the controller are based entirely on experimental data collected f
 
 ## Simple PID Example
 ```python
-from ddc import PIDController
+from ddcontrol import PIDController
 from test_ddc import IPModel
 
 #Creates PID controller and test model
@@ -20,7 +20,7 @@ while True:
 
 ## PID controller
 ```python
-class ddc.PIDController(kp, ki, kd, kn, freq=10, lmin=-inf, lmax=+inf):
+class ddcontrol.PIDController(kp, ki, kd, kn, freq=10, lmin=-inf, lmax=+inf):
 ```
 A proportional–integral–derivative controller (PID controller or three-term controller)
 is a control loop mechanism employing feedback that is widely used inindustrial control systems
