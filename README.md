@@ -1,5 +1,5 @@
 # Data-Driven Control
-Control Theory for humans.
+Control Theory for humans.  
 The design of the controller are based entirely on experimental data collected from the plant.
 
 ## Simple PID Example
