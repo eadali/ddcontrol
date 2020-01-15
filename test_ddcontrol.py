@@ -5,8 +5,8 @@ Created on Fri Jan 10 19:56:26 2020
 
 @author: eadali
 """
-from ddcontrol import PIDController, MSDModel
-from numpy import asarray, zeros, absolute
+from ddcontrol import PIDController, PIDTuner, MSDModel
+from numpy import asarray, zeros, absolute, linspace, sin, pi, fft
 from time import time
 
 
@@ -81,3 +81,23 @@ def test_PIDController():
         y[index] = mdl.update(u_control)
         u_control = pid.update(-y[index])
     assert (absolute(y[-10:]) < 0.04).all()
+    
+
+def test_PIDTuner_disturbance():
+    pid = PIDController(0.0, 0.0, 0.0, 0.0)
+    tuner = PIDTuner(pid, 0.1, (0.6,0.7,2))
+    u = zeros(100)
+    for index in range(u.shape[0]):
+        u[index] = tuner.update(0.0)
+        
+    sp = fft.rfft(u)        
+    from matplotlib import pyplot
+    pyplot.subplot(2,1,1)
+    pyplot.plot(u)
+    pyplot.grid()
+    pyplot.subplot(2,1,2)
+    tt = fft.fftfreq(u.shape[-1])
+    pyplot.plot(tt, sp.real)
+    pyplot.grid()
+    pyplot.show()
+    assert False

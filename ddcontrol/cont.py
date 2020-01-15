@@ -67,3 +67,20 @@ class PIDController:
         # Calculates output
         u_control =  clip(u_sum, self.lmin, self.lmax)
         return u_control
+
+    
+class PIDTuner:
+    def __init__(self, controller, amplitude, freq):
+        self.controller = controller
+        self.amplitude = amplitude
+        self.freq = linspace(freq[0], freq[1], freq[2])
+        self.start = None
+
+    def update(self, err, tune=False):
+        now = time()
+        if self.start is None:
+            self.start = now
+        ctime = now - self.start
+        disturbance = 0.1 * sin(2.0*pi*self.freq*ctime).sum()
+        u_control = self.controller.update(err)
+        return disturbance    
