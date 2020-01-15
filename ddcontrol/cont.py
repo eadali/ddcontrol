@@ -69,15 +69,14 @@ class PIDController:
 
 
 class PIDTuner:
-    def __init__(self, controller, fstart, fstop, num_freq):
+    def __init__(self, controller, amplitude, freq):
         self.controller = controller
-        self.freq = linspace(fstart, fstop, num_freq)
+        self.freq = linspace(freq[0], freq[1], [freq[2]])
         self.counter = 0
-
 
     def update(self, err, tune=False):
         ctime = self.counter * (1.0/self.controller.freq)
         self.counter += 1
-        disturbance = 0.1* sin(2.0 * pi * self.freq * ctime).sum()
+        disturbance = 0.1 * sin(2.0 * pi * self.freq * ctime).sum()
         u_control = self.controller.update(err)
-        return u_control + disturbance
+        return disturbance
