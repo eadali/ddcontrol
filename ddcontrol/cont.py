@@ -10,6 +10,7 @@ from time import time, sleep
 from warnings import warn
 
 
+
 class PIDController:
     def __init__(self, kp, ki, kd, kn, freq=10.0, lmin=-inf, lmax=+inf):
         """Inits PIDContoller parameters
@@ -66,17 +67,3 @@ class PIDController:
         # Calculates output
         u_control =  clip(u_sum, self.lmin, self.lmax)
         return u_control
-
-
-class PIDTuner:
-    def __init__(self, controller, amplitude, freq):
-        self.controller = controller
-        self.freq = linspace(freq[0], freq[1], [freq[2]])
-        self.counter = 0
-
-    def update(self, err, tune=False):
-        ctime = self.counter * (1.0/self.controller.freq)
-        self.counter += 1
-        disturbance = 0.1 * sin(2.0 * pi * self.freq * ctime).sum()
-        u_control = self.controller.update(err)
-        return disturbance

@@ -4,12 +4,11 @@ The design of the controller are based entirely on experimental data collected f
 
 ## Simple PID Example
 ```python
-from ddcontrol import PIDController
-from test_ddc import IPModel
+from ddcontrol import PIDController, MSDModel
 
 #Creates PID controller and test model
 pid = PIDController(kp=8.0, ki=0.01, kd=0.8, kn=10.0)
-mdl = IPModel(0.4, 5.0, [0.5, 0.0])
+mdl = MSDModel(1.0, 1.0, 0.2, [0.4, 0.0])
 
 #Control loop
 u_control = 0
