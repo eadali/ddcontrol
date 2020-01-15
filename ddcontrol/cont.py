@@ -5,7 +5,7 @@ Created on Thu Jan  9 20:18:58 2020
 
 @author: eadali
 """
-from numpy import clip, inf, sign, absolute
+from numpy import clip, inf, sign, absolute, linspace, sin, pi
 from time import time, sleep
 from warnings import warn
 
@@ -68,17 +68,16 @@ class PIDController:
         return u_control
 
 
-
 class PIDTuner:
-    def __init__(self, controller, freq):
-        freq = linspace(freq[0], freq[1], freq[2])
-        disturbance = sin(freq)
-        self.cumulative_time
+    def __init__(self, controller, fstart, fstop, num_freq):
+        self.controller = controller
+        self.freq = linspace(fstart, fstop, num_freq)
+        self.counter = 0
 
 
-    def update(self, err):
-        disturbance = sin(freq*controller.freq)
-        u_control = controller.update(err)
-
-
-
+    def update(self, err, tune=False):
+        ctime = self.counter * (1.0/self.controller.freq)
+        self.counter += 1
+        disturbance = 0.1* sin(2.0 * pi * self.freq * ctime).sum()
+        u_control = self.controller.update(err)
+        return u_control + disturbance
