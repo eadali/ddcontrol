@@ -5,7 +5,6 @@ Created on Wed Jan 15 10:06:42 2020
 @author: ERADALI
 """
 from time import time
-from numpy import linspace
 from scipy.integrate import odeint
 
 

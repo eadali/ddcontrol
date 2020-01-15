@@ -5,7 +5,7 @@ Created on Thu Jan  9 20:18:58 2020
 
 @author: eadali
 """
-from numpy import clip, inf, sign, absolute, linspace, sin, pi
+from numpy import clip, inf, sign, absolute
 from time import time, sleep
 from warnings import warn
 

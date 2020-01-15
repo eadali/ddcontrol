@@ -4,14 +4,14 @@ Created on Tue Jan 14 15:05:54 2020
 
 @author: ERADALI
 """
-
 from distutils.core import setup
 setup(
   name = 'ddcontrol',
   packages = ['ddcontrol'],
   version = '0.1',
   license='MIT',
-  description = 'The design of the controller are based entirely on experimental data collected from the plant',
+  description = 'Control Theory for humans.',
+  long_description='homepage..: https://github.com/eadali/ddcontrol',
   author = 'Erkan ADALI',
   author_email = 'erkanadali91@gmail.com',
   url = 'https://github.com/eadali/ddcontrol',
