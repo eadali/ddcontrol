@@ -6,10 +6,14 @@ Created on Thu Jan  9 20:18:58 2020
 @author: eadali
 """
 from numpy import clip, inf, sign, absolute, linspace, sin, pi
+from copy import deepcopy
 from time import time, sleep
 from warnings import warn
 
 
+
+        
+        
 
 class PIDController:
     def __init__(self, kp, ki, kd, kn, freq=10.0, lmin=-inf, lmax=+inf):
@@ -68,19 +72,42 @@ class PIDController:
         u_control =  clip(u_sum, self.lmin, self.lmax)
         return u_control
 
+
     
 class PIDTuner:
-    def __init__(self, controller, amplitude, freq):
+    def __init__(self, controller, amplitude, freq, norm='hinf'):
         self.controller = controller
+        self.temp_controller = deepcopy(controller)
         self.amplitude = amplitude
         self.freq = linspace(freq[0], freq[1], freq[2])
         self.start = None
 
+
+    def loss(err):
+        loss += err
+        return loss
+    
+    
+    def reset_loss():
+        loss = 0.0
+    
     def update(self, err, tune=False):
-        now = time()
-        if self.start is None:
-            self.start = now
-        ctime = now - self.start
-        disturbance = 0.1 * sin(2.0*pi*self.freq*ctime).sum()
         u_control = self.controller.update(err)
-        return disturbance    
+        
+        if tune:
+            now = time()
+            if self.start is None:
+                self.start = now
+            ctime = now - self.start
+            
+            if ctime > (1.0/self.freq[0])
+                disturbance = 0.1 * sin(2.0*pi*self.freq*ctime).sum()
+                if 
+        
+        else:
+            self.start = None
+        
+            
+
+            
+        return loss, u_control+disturbance    
