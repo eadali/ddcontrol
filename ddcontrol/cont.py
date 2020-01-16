@@ -5,15 +5,14 @@ Created on Thu Jan  9 20:18:58 2020
 
 @author: eadali
 """
-from numpy import clip, inf, sign, absolute, linspace, sin, pi
-from copy import deepcopy
+from numpy import clip, inf, sign, absolute, sin, pi, asarray, nan, full, roll
+from numpy import isnan
+from scipy.signal import lsim
+from scipy.optimize import curve_fit
 from time import time, sleep
 from warnings import warn
 
 
-
-        
-        
 
 class PIDController:
     def __init__(self, kp, ki, kd, kn, freq=10.0, lmin=-inf, lmax=+inf):
@@ -73,41 +72,46 @@ class PIDController:
         return u_control
 
 
-    
+
 class PIDTuner:
-    def __init__(self, controller, amplitude, freq, norm='hinf'):
+    def __init__(self, controller, freq, amplitude):
         self.controller = controller
-        self.temp_controller = deepcopy(controller)
+        self.freq = freq * asarray([1.0/10.0, 1.0/3.0, 1.0, 3.0, 10.0])
         self.amplitude = amplitude
-        self.freq = linspace(freq[0], freq[1], freq[2])
         self.start = None
+        self.gains = None
+        self.history = full((3,int(200.0/self.freq[2])), nan, 'float32')
 
 
-    def loss(err):
-        loss += err
-        return loss
-    
-    
-    def reset_loss():
-        loss = 0.0
-    
-    def update(self, err, tune=False):
+    def model(u, b0, b1, b2, b3, a1, a2, a3, x01, x02, x03):
+        timestamps = u[:,0]
+        u_cont = u[:,1]
+        num = [b0, b1, b2, b3]
+        den = [1.0, a1, a2, a3]
+        x0 = [x01, x02, x03]
+        _, y, _ = lsim((num,den), U=u_cont, T=timestamps, X0=x0)
+        return y
+
+
+    def fit_model(self):
+        self.gains = curve_fit(self.model, self.history[:,(0,1)], self.history[:,2])
+
+
+    def update(self, err, y_meas, tune=False):
         u_control = self.controller.update(err)
-        
         if tune:
             now = time()
             if self.start is None:
                 self.start = now
             ctime = now - self.start
-            
-            if ctime > (1.0/self.freq[0])
-                disturbance = 0.1 * sin(2.0*pi*self.freq*ctime).sum()
-                if 
-        
+            disturbance = 0.1 * sin(2.0*pi*self.freq*ctime).sum()
+            roll(self.history, -1, axis=0)
+            self.history[-1,0] = ctime
+            self.history[-1,1] = u_control
+            self.history[-2,2] = y_meas
+            if not isnan(self.history).any():
+                self.fit_model()
         else:
-            self.start = None
-        
-            
+            self.history = full((3,int(200.0/self.freq[2])), nan, 'float32')
 
-            
-        return loss, u_control+disturbance    
+        return u_control+disturbance
