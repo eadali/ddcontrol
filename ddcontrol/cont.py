@@ -99,19 +99,21 @@ class PIDTuner:
 
     def update(self, err, y_meas, tune=False):
         u_control = self.controller.update(err)
+        disturbance = 0.0
         if tune:
             now = time()
             if self.start is None:
                 self.start = now
             ctime = now - self.start
             disturbance = 0.1 * sin(2.0*pi*self.freq*ctime).sum()
-            roll(self.history, -1, axis=0)
+            self.history = roll(self.history, -1, axis=0)
             self.history[-1,0] = ctime
             self.history[-1,1] = u_control
             self.history[-2,2] = y_meas
-            if not isnan(self.history).any():
-                self.fit_model()
-        else:
-            self.history = full((3,int(200.0/self.freq[2])), nan, 'float32')
+#            if not isnan(self.history).any():
+#                self.fit_model()
+#                self.history = full((3,int(200.0/self.freq[2])), nan, 'float32')
+#        else:
+#            self.history = full((3,int(200.0/self.freq[2])), nan, 'float32')
 
         return u_control+disturbance
