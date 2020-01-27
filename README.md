@@ -1,6 +1,6 @@
 # Data-Driven Control
 Control Theory for humans.  
-The design of the controller are based entirely on experimental data collected from the plant.
+The PID controller design based entirely on experimental data collected from the plant.
 
 ## Simple PID Example
 ```python
@@ -64,11 +64,13 @@ Mathematical equation of PID controller:
 &nbsp;&nbsp;&nbsp;Higher limit for controller output  
 
 **Methods**  
-&nbsp;**start(self)**  
+&nbsp;**start(self) -> None**  
 &nbsp;&nbsp;&nbsp;Starts PID controller thread  
-&nbsp;**stop(self)**  
+
+&nbsp;**stop(self) -> None**  
 &nbsp;&nbsp;&nbsp;Stops PID controller thread  
-&nbsp;**update(self, err)->u_control**  
+
+&nbsp;**update(self, err) -> u_control**  
 &nbsp;&nbsp;&nbsp;Updates PID controller error signal value and returns control signal value
 
 
