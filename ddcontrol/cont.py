@@ -5,8 +5,8 @@ Created on Thu Jan  9 20:18:58 2020
 
 @author: eadali
 """
-from numpy import clip, inf, sign, absolute, sin, pi, asarray, nan, full, roll
-from numpy import isnan
+from numpy import clip, inf, sign, absolute, sin, pi, asarray, nan, roll
+from numpy import isnan, full
 from scipy.signal import lsim
 from scipy.optimize import curve_fit
 from time import time, sleep
@@ -17,7 +17,7 @@ from warnings import warn
 class PIDController:
     def __init__(self, kp, ki, kd, kn, freq=10.0, lmin=-inf, lmax=+inf):
         """Inits PIDContoller parameters
-        # Arguments
+        #Arguments
             kp: Proportional gain
             ki: Integral gain
             kd: Derivative gain
@@ -43,6 +43,12 @@ class PIDController:
 
 
     def update(self, err):
+        """Calculates control signal
+        #Arguments
+            err: Error signal value
+        #Returns
+            Value of control signal
+        """
         #Fixes frequency of controller
         if self.past is not None:
             wait = (1.0/self.freq) - (time()-self.past)
@@ -82,6 +88,7 @@ class PIDTuner:
         self.gains = None
         self.history = full((3,int(200.0/self.freq[2])), nan, 'float32')
 
+        
 
     def model(u, b0, b1, b2, b3, a1, a2, a3, x01, x02, x03):
         timestamps = u[:,0]
