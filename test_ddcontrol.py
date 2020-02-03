@@ -5,7 +5,7 @@ Created on Fri Jan 10 19:56:26 2020
 
 @author: eadali
 """
-from ddcontrol import PIDController, MSDModel, Interpolate, DDE, StateSpace
+from ddcontrol import PIDController, MSDModel, Interpolate, DDE, StateSpace, TransferFunction
 from numpy import zeros, absolute, ones, linspace
 from scipy.signal import lsim2, lti
 from time import time, sleep
@@ -144,12 +144,12 @@ def test_StateSpace():
     u_cont = ones(timestamps.shape)
     y_meas = zeros(timestamps.shape)
     for index in range(timestamps.shape[0]):
-        y_meas[index] = ss.update(timestamps[index], u_cont[index])
+        y_meas[index] = ss.integrate(timestamps[index], u_cont[index])
     _, y, _ = lsim2(scipy_ss, u_cont, timestamps)
     assert (absolute(y_meas-y)<0.1).all()
 
 
-def test_StateSpace_idelay():
+def test_StateSpace_udelay():
     """Test of StateSpace with input delay
     """
     A, B, C, D = [[0., 1.], [0., 0.]], [[0.], [1.]], [[1., 0.]], 0.
@@ -163,12 +163,12 @@ def test_StateSpace_idelay():
     u_cont = ones(timestamps.shape)
     y_meas = zeros(timestamps.shape)
     for index in range(timestamps.shape[0]):
-        y_meas[index] = ss.update(timestamps[index], u_cont[index])
+        y_meas[index] = ss.integrate(timestamps[index], u_cont[index])
     _, y, _ = lsim2(scipy_ss, u_cont, timestamps)
     assert (absolute(y_meas[5:]-y[:-5]< 0.4).all())
 
 
-def test_StateSpace_odelay():
+def test_StateSpace_ydelay():
     """Test of StateSpace with output delay
     """
     A, B, C, D = [[0., 1.], [0., 0.]], [[0.], [1.]], [[1., 0.]], 0.
@@ -182,7 +182,7 @@ def test_StateSpace_odelay():
     u_cont = ones(timestamps.shape)
     y_meas = zeros(timestamps.shape)
     for index in range(timestamps.shape[0]):
-        y_meas[index] = ss.update(timestamps[index], u_cont[index])
+        y_meas[index] = ss.integrate(timestamps[index], u_cont[index])
     _, y, _ = lsim2(scipy_ss, u_cont, timestamps)
     assert (absolute(y_meas[5:]-y[:-5]< 0.4).all())
 
@@ -206,8 +206,42 @@ def test_StateSpace_sdelay():
     B = [[[0.]], [[0.]]]
     C = [[[1.]],[[0.]]]
     D = [[[0.]],[[0.]]]
-    ss = StateSpace(A, B, C, D, x0=[1.0], delays=[0.0,1.0])
+    ss = StateSpace(A, B, C, D, delays=[0.0,1.0])
+    ss.set_initial_value(x0=[1.0])
     y_meas = zeros(timestamps.shape)
     for index in range(timestamps.shape[0]):
-        y_meas[index] = ss.update(timestamps[index], [0.0])
+        y_meas[index] = ss.integrate(timestamps[index], [0.0])
     assert (absolute(y_meas-y)<0.1).all()
+
+
+def test_TransferFunction():
+    """Test of TransferFunction
+    """
+    num = [1, 3, 3]
+    den = [1, 2, 1]
+    tf = TransferFunction(num, den)
+    scipy_tf = lti(num, den)
+    timestamps = linspace(0,10,50)
+    u_cont = ones(timestamps.shape)
+    y_meas = zeros(timestamps.shape)
+    for index in range(timestamps.shape[0]):
+        y_meas[index] = tf.integrate(timestamps[index], u_cont[index])
+    _, y, _ = lsim2(scipy_tf, u_cont, timestamps)
+    assert (absolute(y_meas-y)<0.1).all()
+
+
+def test_TransferFunction_udelay():
+    """Test of TransferFunction with input delay
+    """
+    num = [1, 3, 3]
+    den = [1, 2, 1]
+    tf = TransferFunction(num, den, 1.0)
+    tf.set_initial_value(0.0)
+    scipy_tf = lti(num, den)
+    timestamps = linspace(0,10,50)
+    u_cont = ones(timestamps.shape)
+    y_meas = zeros(timestamps.shape)
+    for index in range(timestamps.shape[0]):
+        y_meas[index] = tf.integrate(timestamps[index], u_cont[index])
+    _, y, _ = lsim2(scipy_tf, u_cont, timestamps)
+    assert (absolute(y_meas[5:]-y[:-5]< 0.4).all())

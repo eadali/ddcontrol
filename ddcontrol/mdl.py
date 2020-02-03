@@ -5,8 +5,10 @@ Created on Wed Jan 15 10:06:42 2020
 @author: ERADALI
 """
 from scipy.integrate import ode
-from numpy import array, zeros, ndarray, expand_dims
+from numpy import array, zeros, ndarray, expand_dims, stack
+from numbers import Number
 from scipy.interpolate import interp1d
+from scipy.signal import tf2ss
 from collections import deque
 from time import time
 from scipy.integrate import odeint
@@ -62,6 +64,7 @@ class DDE(ode):
         ode.__init__(self, w, jac)
         self.set_f_params(())
 
+
     def set_initial_value(self, g, t0=0.0):
         """Set initial conditions y(t) = y."""
         self.t0 = t0
@@ -103,54 +106,62 @@ class DDE(ode):
 
 
 class StateSpace:
-    def __init__(self, A, B, C, D, x0=None, u0=None, delays=None):
-        """Inits state space model
+    def __init__(self, A, B, C, D, delays=None):
+        """Inits state space matrices and solver
         #Arguments:
             A, B, C, D: State space matrices
-            x0: Initial condition for states
             delays: Delay values
         """
-        #Sets state space matrices
-        self.A = array(A, 'float32')
+        #Converts list to narray and fix to 3 dimension
+        self.A = array(A, 'float32', copy=True)
         if self.A.ndim == 2:
             self.A = expand_dims(self.A, 0)
-        self.B = array(B, 'float32')
+        self.B = array(B, 'float32', copy=True)
         if self.B.ndim == 2:
             self.B = expand_dims(self.B, 0)
-        self.C = array(C, 'float32')
+        self.C = array(C, 'float32', copy=True)
         if self.C.ndim == 2:
             self.C = expand_dims(self.C, 0)
-        self.D = array(D, 'float32')
+        self.D = array(D, 'float32', copy=True)
         if self.D.ndim == 2:
             self.D = expand_dims(self.D, 0)
-        #Sets states initial
-        if x0 is None:
-            x0 = lambda t: zeros(self.A.shape[2], 'float32')
-        elif isinstance(x0, (list, tuple, ndarray)):
-            xc = x0.copy()
-            x0 = lambda t: array(xc, 'float32' )
-        #Sets input initial
-        if u0 is None:
-            u0 = lambda t: zeros(self.B.shape[2], 'float32')
-        elif isinstance(u0, (list, tuple, ndarray)):
-            uc = u0.copy()
-            u0 = lambda t: array(uc, 'float32')
         #Sets delays
         if delays is None:
             self.delays = array([0.0], 'float32')
-        elif isinstance(delays, list) or isinstance(delays, ndarray):
-            self.delays = array(delays, 'float32')
+        elif isinstance(delays, (list,tuple)):
+            self.delays = array(delays, 'float32').copy()
+        #Configures DDE
+        self.solver = DDE(self._ss_eq)
+        self.solver.set_integrator('dopri5')
+        self.set_initial_value()
+
+
+    def set_initial_value(self, x0=None, u0=None):
+        """Inits states and inputs
+        #Arguments
+            x0: Initial states
+            u0: Initial inputs
+        """
+        #Creates initial state function
+        if x0 is None:
+            x0 = lambda t: zeros(self.A.shape[2], 'float32')
+        elif isinstance(x0, (list,tuple,ndarray)):
+            xc = x0.copy()
+            x0 = lambda t: array(xc, 'float32', copy=True)
+        #Creates initial input function
+        if u0 is None:
+            u0 = lambda t: zeros(self.B.shape[2], 'float32')
+        elif isinstance(u0, (list,tuple,ndarray)):
+            uc = u0.copy()
+            u0 = lambda t: array(uc, 'float32', copy=True)
         #Creates input function
         self.u = Interpolate(u0, 0.0)
         #Creates states function
         self.x = Interpolate(x0, 0.0)
-        #Sets DDE
-        self.solver = DDE(self.equation)
-        self.solver.set_integrator('dopri5')
         self.solver.set_initial_value(x0, 0.0)
 
 
-    def equation(self, t, x, u):
+    def _ss_eq(self, t, x, u):
         """Delay Differential Equation
         #Arguments:
             t: Timestamp
@@ -173,21 +184,21 @@ class StateSpace:
         return dxdt
 
 
-    def update(self, t, u_new):
-        """Updates state space model
+    def integrate(self, t, u):
+        """Integrates state space model
         #Arguments:
             t: Timestamp
             u: Input value
         #Returns
             Output of state space model
         """
-        #Appends new input value
-        self.u.append(t, u_new)
-        #Sets input
-        self.solver.set_f_params((self.u,))
-        #Solves dde
-        x_new = self.solver.integrate(t)
-        self.x.append(t, x_new)
+        if t >= 0.0:
+            #Appends new input value to input function
+            self.u.append(t, u)
+            #Sets input parameter
+            self.solver.set_f_params((self.u,))
+            #Solves dde
+            self.x.append(t, self.solver.integrate(t))
         ##TODO: find a clean solution
         #Creates state matrix
         xd = zeros((self.A.shape[0],1,self.A.shape[2]), 'float32')
@@ -199,6 +210,44 @@ class StateSpace:
             ud[index,:,:] = self.u(t-dly)
         y = (self.C*xd).sum(axis=(0,2)) + (self.D*ud).sum(axis=(0,2))
         return y
+
+
+
+class TransferFunction(StateSpace):
+    def __init__(self, num, den, udelay=None):
+        """Inits transfer function coeffs and solver
+        #Arguments:
+            num, den: Transfer function coeffs
+            udelay: Input delay value
+        """
+        #Creates state space matrices
+        A, B, C, D = tf2ss(num, den)
+        if udelay is not None:
+            A = stack((A,zeros(A.shape)))
+            B = stack((zeros(B.shape), B))
+            C = stack((C, zeros(C.shape)))
+            D = stack((D, zeros(D.shape)))
+            udelay = [0.0, udelay]
+        #Calls state space init function
+        StateSpace.__init__(self, A, B, C, D, delays=udelay)
+
+
+    def set_initial_value(self, u0=None):
+        """Inits states and inputs
+        #Arguments
+            u0: Initial inputs
+        """
+        #Creates input function
+        if isinstance(u0, Number):
+            uc = u0
+            u0 = lambda t: array(uc, 'float32', copy=True)
+        #Calls state space init functio
+        StateSpace.set_initial_value(self, u0=u0)
+
+
+    def to_ss(self):
+        ##TODO: implement this function
+        pass
 
 
 
