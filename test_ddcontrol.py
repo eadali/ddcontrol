@@ -5,7 +5,8 @@ Created on Fri Jan 10 19:56:26 2020
 
 @author: eadali
 """
-from ddcontrol import PIDController, MSDModel, Interpolate, DDE, StateSpace, TransferFunction
+from ddcontrol import PIDController, MSDModel, Interpolate, DDE, StateSpace
+from ddcontrol import TransferFunction, tfest
 from numpy import zeros, absolute, ones, linspace
 from scipy.signal import lsim2, lti
 from time import time, sleep
@@ -245,3 +246,19 @@ def test_TransferFunction_udelay():
         y_meas[index] = tf.integrate(timestamps[index], u_cont[index])
     _, y, _ = lsim2(scipy_tf, u_cont, timestamps)
     assert (absolute(y_meas[5:]-y[:-5]< 0.4).all())
+
+
+def test_tfest():
+    """Test of tfest function without delay
+    """
+    num = [1, 3, 3]
+    den = [1, 2, 1]
+    scipy_tf = lti(num, den)
+    timestamps = linspace(0,10,50)
+    u_cont = ones(timestamps.shape)
+    _, y, _ = lsim2(scipy_tf, u_cont, timestamps)
+    tf, _ = tfest(timestamps, y, u_cont, 3, 3)
+    y_meas = zeros(timestamps.shape)
+    for index in range(timestamps.shape[0]):
+        y_meas[index] = tf.integrate(timestamps[index], u_cont[index])
+    assert (absolute(y_meas-y)<0.1).all()

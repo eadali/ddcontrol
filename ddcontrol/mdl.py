@@ -5,13 +5,14 @@ Created on Wed Jan 15 10:06:42 2020
 @author: ERADALI
 """
 from scipy.integrate import ode
-from numpy import array, zeros, ndarray, expand_dims, stack
+from numpy import array, zeros, ndarray, expand_dims, stack, ones
 from numbers import Number
 from scipy.interpolate import interp1d
 from scipy.signal import tf2ss
 from collections import deque
 from time import time
 from scipy.integrate import odeint
+from scipy.optimize import curve_fit
 
 
 
@@ -250,6 +251,46 @@ class TransferFunction(StateSpace):
         pass
 
 
+def tfest(t, y, u, np, nz=None, delay=False):
+    """Estimates transfer function coeffs
+    #Arguments
+        t: Timestamp values of measurments
+        y: Measured output signal of system
+        u: Applied control signal to system
+        np: Number of poles
+        nz: Number of zeros
+        delay: Status of input delay
+    #Returns
+        Estimated numerator, denominator coeffs and covariance
+    """
+    #Timestamps start from zero
+    t -= t.min()
+    #If number of zeros is not given it is np-1
+    if nz is None:
+        nz = int(nz-1)
+    #Creates initial prediction
+    if delay:
+        p0 = ones((nz+1)+(np+1)+1, 'float32')
+    else:
+        p0 = ones((nz+1)+(np+1), 'float32')
+    #Reshape function for flattened array
+    def _reshape(p, nz, np, delay):
+        udelay = p[(nz+1)+(np+1)] if delay else None
+        return p[0:(nz+1)], p[(nz+1):(nz+1)+(np+1)], udelay
+    #Model for optimization
+    def mdl(_, *p):
+        num, den, udelay = _reshape(p, nz, np, delay)
+        tf = TransferFunction(num, den, udelay)
+        _y = zeros((t.shape[0]), 'float32')
+        for index in range(t.shape[0]):
+            _y[index] = tf.integrate(t[index], u[index])
+        return _y
+    #Optimizes the transfer function gains
+    popt, pcov = curve_fit(mdl, u, y, p0, epsfcn=1e-5)
+    #Creates num, den and delay values
+    num, den, udelay = _reshape(popt, nz, np, delay)
+    return (TransferFunction(num, den, udelay), pcov)
+
 
 ##TODO: Reframe model
 class MSDModel:
@@ -300,3 +341,32 @@ class MSDModel:
         x = odeint(self.ode, self.x0, [0.0, dt], args=(u,))
         self.x0 = x[1,:]
         return x[1,0]
+
+
+##TODO: Implement this function
+#def estimate_ss(t, y, u, ns, nd=None):
+#    nu = 0.0
+#    ny = 0.0
+#    p0 = ones(nd*ns*ns + nd*ns*nu + nd*ny*ns + nd*ny*nu + ns + nu 'float32')
+#
+#    def _reshape(p, nd, ns, nu, ny, nd):
+#        A = p[:].reshape(nd, ns, ns)
+#        B = p[:].reshape(nd, ns, nu)
+#        C = p[:].reshape(nd, ny, ns)
+#        D = p[:].reshape(nd, ny, nu)
+#        return A, B, C, D, delays
+#
+#    def mdl(_, *p):
+#        A, B, C, D, delays_reshape
+#        ss = StateSpace(A, B, C, D, delays)
+#        _y = zeros((t.shape[0],ny), 'float32')
+#        for index in range(t.shape[0]):
+#            _y[index] = ss.integrate(t[index], u[index])
+#        return _y
+#    popt, pcov = curve_fit(model, u_cont, y_meas, p0=init)
+#    A = popt[:].reshape(nd, ns, ns)
+#    B = popt[:].reshape(nd, ns, nu)
+#    C = popt[:].reshape(nd, ny, ns)
+#    D = popt[:].reshape(nd, ny, nu)
+#    delays
+#    return StateSpace(A, B, C, D, delays=delays)
