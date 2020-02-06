@@ -12,10 +12,10 @@ ddcontrol\.cont module
     :undoc-members:
     :show-inheritance:
 
-ddcontrol\.mdl module
----------------------
+ddcontrol\.model module
+-----------------------
 
-.. automodule:: ddcontrol.mdl
+.. automodule:: ddcontrol.model
     :members:
     :undoc-members:
     :show-inheritance:
