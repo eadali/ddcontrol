@@ -88,7 +88,7 @@ class StateSpace:
         return dxdt
 
 
-    def integrate(self, t, u):
+    def step(self, t, u):
         """Find dot(x)=A x + B u, set x as an initial condition, 
         and return y = C x + D u.
         
