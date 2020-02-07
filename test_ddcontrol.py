@@ -53,7 +53,7 @@ def test_StateSpace():
     ss = StateSpace(A, B, C, D)
     y_ss = zeros(t.shape)
     for index in range(t.shape[0]):
-        y_ss[index] = ss.integrate(t[index], u[index])
+        y_ss[index] = ss.step(t[index], u[index])
     assert (absolute(y_ss-y_scipy) < 0.1).all()
 
 
@@ -73,7 +73,7 @@ def test_StateSpace_udelay():
     ss = StateSpace(A, B, C, D, delays=[0.0,1.0])
     y_ss = zeros(t.shape)
     for index in range(t.shape[0]):
-        y_ss[index] = ss.integrate(t[index], u[index])
+        y_ss[index] = ss.step(t[index], u[index])
     assert (absolute(y_ss[argmax(t>=1.0):]-y_scipy[:-argmax(t>=1.0)] < 0.1).all())
 
 
@@ -93,7 +93,7 @@ def test_StateSpace_ydelay():
     ss = StateSpace(A, B, C, D, delays=[0.0,1.0])
     y_ss = zeros(t.shape)
     for index in range(t.shape[0]):
-        y_ss[index] = ss.integrate(t[index], u[index])
+        y_ss[index] = ss.step(t[index], u[index])
     assert (absolute(y_ss[argmax(t>=1.0):]-y_scipy[:-argmax(t>=1.0)] < 0.1).all())
 
 
@@ -117,7 +117,7 @@ def test_StateSpace_sdelay():
     ss.set_initial_value(x0=[1.0])
     y_ss = zeros(t.shape)
     for index in range(t.shape[0]):
-        y_ss[index] = ss.integrate(t[index], [0.0])
+        y_ss[index] = ss.step(t[index], [0.0])
     assert (absolute(y_ss-y_dde) < 0.1).all()
 
 
@@ -133,7 +133,7 @@ def test_TransferFunction():
     _, y_scipy, _ = lsim2(scipy_tf, u, t)
     y_tf = zeros(t.shape)
     for index in range(t.shape[0]):
-        y_tf[index] = tf.integrate(t[index], u[index])
+        y_tf[index] = tf.step(t[index], u[index])
     assert (absolute(y_tf-y_scipy)<0.1).all()
 
 
@@ -151,13 +151,14 @@ def test_TransferFunction_udelay():
     tf.set_initial_value(0.0)
     y_tf = zeros(t.shape)
     for index in range(t.shape[0]):
-        y_tf[index] = tf.integrate(t[index], u[index])
+        y_tf[index] = tf.step(t[index], u[index])
     assert (absolute(y_tf[argmax(t>=1.0):]-y_scipy[:-argmax(t>=1.0)] < 0.1).all())
 
 
 def test_tfest():
     """Test of tfest Method
     """
+    assert False
     t = linspace(0,10,101)
     u = ones(t.shape)
     num = [1.0, 3.0, 3.0]
@@ -167,7 +168,7 @@ def test_tfest():
     tf, _ = tfest(t, y_scipy, u, 3, 3)
     y_tf = zeros(t.shape)
     for index in range(t.shape[0]):
-        y_tf[index] = tf.integrate(t[index], u[index])
+        y_tf[index] = tf.step(t[index], u[index])
     assert (absolute(y_tf-y_scipy)<0.1).all()
     
     
@@ -175,23 +176,23 @@ def test_tfest_udelay():
     """Test of tfest Method with udelay
     """
     assert False
-#    t = linspace(0,10,101)
-#    u = ones(t.shape)
-#    num = [1.0, 3.0, 3.0]
-#    den = [1.0, 2.0, 1.0]
-#    scipy_tf = lti(num, den)
-#    _, y_scipy, _ = lsim2(scipy_tf, u, t) 
-#    y_scipy[argmax(t>=1.0):] = y_scipy[:-argmax(t>=1.0)]
-#    y_scipy[:argmax(t>=1.0)] = 1.0
-#    tf, _ = tfest(t, y_scipy, u, 3, 3, True)
-#    y_tf = zeros(t.shape)
-#    for index in range(t.shape[0]):
-#        y_tf[index] = tf.integrate(t[index], u[index])
-##    from matplotlib import pyplot
-##    pyplot.plot(y_scipy)
-##    pyplot.plot(y_tf)
-##    pyplot.show()
-#    assert (absolute(y_tf-y_scipy)<0.1).all()
+    t = linspace(0,10,101)
+    u = ones(t.shape)
+    num = [1.0, 3.0, 3.0]
+    den = [1.0, 2.0, 1.0]
+    scipy_tf = lti(num, den)
+    _, y_scipy, _ = lsim2(scipy_tf, u, t) 
+    y_scipy[argmax(t>=1.0):] = y_scipy[:-argmax(t>=1.0)]
+    y_scipy[:argmax(t>=1.0)] = 1.0
+    tf, _ = tfest(t, y_scipy, u, 3, 3, True)
+    y_tf = zeros(t.shape)
+    for index in range(t.shape[0]):
+        y_tf[index] = tf.integrate(t[index], u[index])
+#    from matplotlib import pyplot
+#    pyplot.plot(y_scipy)
+#    pyplot.plot(y_tf)
+#    pyplot.show()
+    assert (absolute(y_tf-y_scipy)<0.1).all()
     
 
 def test_PIDController_P():
@@ -200,8 +201,8 @@ def test_PIDController_P():
     pid = PIDController(kp=1.0, ki=0.0, kd=0.0, kn=0.0)
     u = pid.step(1.0, 1.0)
     assert abs(u-1.0) < 1e-4
-
-
+    
+    
 def test_PIDController_I():
     """Test of PIDController Class I gain
     """
@@ -209,45 +210,50 @@ def test_PIDController_I():
     u = pid.step(1.0, 1.0)
     assert abs(u-1.0) < 1e-4
 
-
+    
 def test_PIDController_D():
-    """Test of PIDController D gain
+    """Test of PIDController Class D gain
     """
-    pid = PIDController(kp=0.0, ki=0.0, kd=1.0, kn=1.0, freq=10.0)
+    pid = PIDController(kp=0.0, ki=0.0, kd=1.0, kn=1.0)
     u = pid.step(1.0, 1.0)
     assert abs(u-1.0) < 1e-4
 
 
 def test_PIDController_clamp():
-    """Test of PIDController clamp
+    """Test of PIDController Class clamp
     """
-    pid = PIDController(kp=0.0, ki=1.0, kd=0.0, kn=0.0, freq=10.0, lmin=-0.4, lmax=0.4)
+    pid = PIDController(kp=0.0, ki=1.0, kd=0.0, kn=0.0, lmin=-1.0, lmax=1.0)
+    check1 = pid.step(10.0, 1.0) < 1.1
+    check2 = pid.step(-100.0, 1.0) > -1.1
+    assert check1 and check2
+
+
+def test_PIDController():
+    """Test of PIDController Class
+    """
+    mdl = TransferFunction([1.0], [1.0,0.2,1.0])
+    pid = PIDController(kp=2.000, ki=0.1, kd=0.0, kn=0.1)
     pid.start()
-    pid.update(1.0)
-    sleep(1.0)
-    u_cont = pid.update(1.0)
-    check1 = u_cont < 0.5
-    pid.update(-1.0)
-    sleep(1.0)
-    u_cont = pid.update(-1.0)
-    check2 = u_cont > -0.5
+    
+    y = list()
+    t = list()
+    u = list()
+    u.append(0.0)
+    start = time()
+    while True:
+        t.append(time()-start)
+        y.append(mdl.step(t[-1], u[-1]+1.0))
+        u.append(pid.update(-y[-1]))
+        sleep(0.001)
+        if t[-1] > 4.0:
+            break
     pid.stop()
     pid.join()
-    assert check1 and check2
-#
-#
-#def test_PIDController():
-#    """Test of PIDController
-#    """
-#    pid = PIDController(8.0, 0.01, 8.0, 10.0)
-#    mdl = MSDModel(1.0, 1.0, 0.2, [0.4, 0.0])
-#    y = zeros(400)
-#    u_control = 0.0
-#    pid.start()
-#    for index in range(y.shape[0]):
-#        y[index] = mdl.update(u_control)
-#        u_control = pid.update(-y[index])
-#        sleep(0.01)
-#    pid.stop()
-#    pid.join()
-#    assert (absolute(y[-10:]) < 0.01).all()
+#    scipy_tf = lti([1.0], [1.0,0.2,1.0])
+#    u = ones(len(t))
+#    _, y, _ = lsim2(scipy_tf, u, t)
+    from matplotlib import pyplot
+    pyplot.plot(t, y)
+#    pyplot.plot(t, u[:-1])
+    pyplot.show()
+    assert (absolute(y[-10:]) < 0.01).all()

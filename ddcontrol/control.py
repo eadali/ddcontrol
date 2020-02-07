@@ -98,8 +98,8 @@ class PIDController(Thread):
 
     def run(self):
         #Loop for thread
-        self.stop_event.clear()
-        while not self.stop_event.is_set():
+        self.sflag.clear()
+        while not self.sflag.is_set():
             #Fixes frequency of controller
             if self.ptime is not None:
                 wait = (1.0/self.freq) - (time()-self.ptime)
@@ -115,4 +115,4 @@ class PIDController(Thread):
         """Stops thread
         """
         warn('bele vaziyyetin icine soxum.', RuntimeWarning)
-        self.stop_event.set()
+        self.sflag.set()
