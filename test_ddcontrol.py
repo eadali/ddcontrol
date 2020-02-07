@@ -197,85 +197,50 @@ from time import time, sleep
 def test_PIDController_P():
     """Test of PIDController Class P gain
     """
-    pid = PIDController(kp=1.0, ki=0.0, kd=0.0, kn=0.0, freq=10.0)
+    pid = PIDController(kp=1.0, ki=0.0, kd=0.0, kn=0.0)
+    u = pid.step(1.0, 1.0)
+    assert abs(u-1.0) < 0.001
+
+    
+def test_PIDController_I():
+    """Test of PIDController Class I gain
+    """
+    pid = PIDController(kp=0.0, ki=1.0, kd=0.0, kn=0.0)
+    u = pid.step(1.0, 1.0)
+    assert abs(u-1.0) < 1e-4
+
+    
+def test_PIDController_D():
+   """Test of PIDController Class D gain
+   """
+    pid = PIDController(kp=0.0, ki=0.0, kd=1.0, kn=1.0)
+    u = pid.step(1.0, 1.0)
+    assert abs(u-1.0) < 1e-4
+
+
+def test_PIDController_clamp():
+    """Test of PIDController Class clamp
+    """
+    pid = PIDController(kp=0.0, ki=1.0, kd=0.0, kn=0.0, lmin=-1.0, lmax=1.0)
+    check1 = pid.step(10.0, 1.0) < 1.1
+    check1 = pid.step(-100.0, 1.0) > -1.1
+    assert check1 and check2
+
+
+def test_PIDController():
+    """Test of PIDController
+    """
+    mdl = MSDModel(1.0, 1.0, 0.2, [0.4, 0.0])
+    
+    y = list()
+    u = 0.0
+    pid = PIDController(kp=8.0, ki=0.01, kd=8.0, freq=10.0)
     pid.start()
-    pid.integrate(1.0)
-    sleep(0.4)
-    u = pid.integrate(1.0)
+    start = time()
+    while time()-start < 4.0:
+        y[index] = mdl.update(u_control)
+        u_control = pid.update(-y[index])
+        sleep(0.0001)
     pid.stop()
     pid.join()
-    assert abs(1.0-u) < 0.001
-#
-#
-#def test_PIDController_I():
-#    """Test of PIDController I gain
-#    """
-#    pid = PIDController(kp=0.0, ki=1.0, kd=0.0, kn=0.0, freq=10.0)
-#    pid.start()
-#    pid.update(1.0)
-#    sleep(1.0)
-#    u_cont = pid.update(1.0)
-#    pid.stop()
-#    pid.join()
-#    assert abs(1.0-u_cont) < 0.2
-#
-#
-#def test_PIDController_D():
-#    """Test of PIDController D gain
-#    """
-#    pid = PIDController(kp=0.0, ki=0.0, kd=1.0, kn=1.0, freq=10.0)
-#    pid.start()
-#    pid.update(1.0)
-#    sleep(1.0)
-#    u_cont = pid.update(1.0)
-#    pid.stop()
-#    pid.join()
-#    assert abs(0.4-u_cont) < 0.2
-#
-#
-#def test_PIDController_freq():
-#    """Test of PIDController frequency
-#    """
-#    pid = PIDController(kp=0.0, ki=1.0, kd=0.0, kn=0.0, freq=10.0)
-#    pid.start()
-#    start = time()
-#    sleep(1.0)
-#    end = pid.past
-#    pid.stop()
-#    pid.join()
-#    assert abs(end-start-1.0) < 0.2
-#
-#
-#def test_PIDController_clamp():
-#    """Test of PIDController clamp
-#    """
-#    pid = PIDController(kp=0.0, ki=1.0, kd=0.0, kn=0.0, freq=10.0, lmin=-0.4, lmax=0.4)
-#    pid.start()
-#    pid.update(1.0)
-#    sleep(1.0)
-#    u_cont = pid.update(1.0)
-#    check1 = u_cont < 0.5
-#    pid.update(-1.0)
-#    sleep(1.0)
-#    u_cont = pid.update(-1.0)
-#    check2 = u_cont > -0.5
-#    pid.stop()
-#    pid.join()
-#    assert check1 and check2
-#
-#
-#def test_PIDController():
-#    """Test of PIDController
-#    """
-#    pid = PIDController(8.0, 0.01, 8.0, 10.0)
-#    mdl = MSDModel(1.0, 1.0, 0.2, [0.4, 0.0])
-#    y = zeros(400)
-#    u_control = 0.0
-#    pid.start()
-#    for index in range(y.shape[0]):
-#        y[index] = mdl.update(u_control)
-#        u_control = pid.update(-y[index])
-#        sleep(0.01)
-#    pid.stop()
-#    pid.join()
-#    assert (absolute(y[-10:]) < 0.01).all()
+    assert (absolute(y[-10:]) < 0.01).all()
