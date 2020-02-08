@@ -71,8 +71,8 @@ class StateSpace:
         self.solver.set_initial_value(w, 0.0)
 
 
+    ##TODO: find a clean solution for xd and ud
     def __ss_eq(self, t, x, u):
-        ##TODO: find a clean solution
         #Creates state matrix
         xd = zeros((self.A.shape[0],1,self.A.shape[2]), 'float32')
         for index, dly in enumerate(self.delays):
@@ -85,10 +85,10 @@ class StateSpace:
         dxdt = (self.A*xd).sum(axis=(0,2)) + (self.B*ud).sum(axis=(0,2))
         return dxdt
 
-
+    ##TODO: find a clean solution for xd and ud
     def step(self, t, u):
-        """Find dot(x)=A x + B u, set x as an initial condition, 
-        and return y = C x + D u.
+        """Find dxdy = Ax + Bu, set x as an initial condition, 
+        and return y = Cx + Du.
         
         Args:
             t (float): The endpoint of the integration step.
@@ -104,7 +104,6 @@ class StateSpace:
             self.solver.set_f_params((self.u,))
             #Solves dde
             self.x.append(t, self.solver.integrate(t))
-        ##TODO: find a clean solution
         #Creates state matrix
         xd = zeros((self.A.shape[0],1,self.A.shape[2]), 'float32')
         for index, dly in enumerate(self.delays):
@@ -152,11 +151,11 @@ class TransferFunction(StateSpace):
         StateSpace.set_initial_value(self, u0=u0)
 
 
+    ##TODO: implement this function
     def to_ss(self):
-        ##TODO: implement this function
         pass
 
-
+##TODO: Function is very slow. improve
 def tfest(t, y, u, np, nz=None, delay=False, epsfcn=1e-5):
     """Estimates a continuous-time transfer function.
     
@@ -200,32 +199,3 @@ def tfest(t, y, u, np, nz=None, delay=False, epsfcn=1e-5):
     #Creates num, den and delay values
     num, den, udelay = _reshape(popt, nz, np, delay)
     return (TransferFunction(num, den, udelay), pcov)
-
-
-##TODO: Implement this function
-#def estimate_ss(t, y, u, ns, nd=None):
-#    nu = 0.0
-#    ny = 0.0
-#    p0 = ones(nd*ns*ns + nd*ns*nu + nd*ny*ns + nd*ny*nu + ns + nu 'float32')
-#
-#    def _reshape(p, nd, ns, nu, ny, nd):
-#        A = p[:].reshape(nd, ns, ns)
-#        B = p[:].reshape(nd, ns, nu)
-#        C = p[:].reshape(nd, ny, ns)
-#        D = p[:].reshape(nd, ny, nu)
-#        return A, B, C, D, delays
-#
-#    def mdl(_, *p):
-#        A, B, C, D, delays_reshape
-#        ss = StateSpace(A, B, C, D, delays)
-#        _y = zeros((t.shape[0],ny), 'float32')
-#        for index in range(t.shape[0]):
-#            _y[index] = ss.integrate(t[index], u[index])
-#        return _y
-#    popt, pcov = curve_fit(model, u_cont, y_meas, p0=init)
-#    A = popt[:].reshape(nd, ns, ns)
-#    B = popt[:].reshape(nd, ns, nu)
-#    C = popt[:].reshape(nd, ny, ns)
-#    D = popt[:].reshape(nd, ny, nu)
-#    delays
-#    return StateSpace(A, B, C, D, delays=delays)

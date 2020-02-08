@@ -7,7 +7,7 @@ Created on Fri Jan 10 19:56:26 2020
 """
 from ddcontrol.integrate import CInterp1d, DDE
 from ddcontrol.model import StateSpace, TransferFunction, tfest
-from ddcontrol.control import PIDController
+from ddcontrol.control import PIDController, tunePID
 from numpy import zeros, absolute, ones, linspace, argmax
 from scipy.signal import lsim2, lti
 from time import time, sleep
@@ -158,14 +158,13 @@ def test_TransferFunction_udelay():
 def test_tfest():
     """Test of tfest Method
     """
-    assert False
     t = linspace(0,10,101)
     u = ones(t.shape)
     num = [1.0, 3.0, 3.0]
     den = [1.0, 2.0, 1.0]
     scipy_tf = lti(num, den)
     _, y_scipy, _ = lsim2(scipy_tf, u, t)
-    tf, _ = tfest(t, y_scipy, u, 3, 3)
+    tf, _ = tfest(t, y_scipy, u, np=3, nz=3)
     y_tf = zeros(t.shape)
     for index in range(t.shape[0]):
         y_tf[index] = tf.step(t[index], u[index])
@@ -176,23 +175,6 @@ def test_tfest_udelay():
     """Test of tfest Method with udelay
     """
     assert False
-    t = linspace(0,10,101)
-    u = ones(t.shape)
-    num = [1.0, 3.0, 3.0]
-    den = [1.0, 2.0, 1.0]
-    scipy_tf = lti(num, den)
-    _, y_scipy, _ = lsim2(scipy_tf, u, t) 
-    y_scipy[argmax(t>=1.0):] = y_scipy[:-argmax(t>=1.0)]
-    y_scipy[:argmax(t>=1.0)] = 1.0
-    tf, _ = tfest(t, y_scipy, u, 3, 3, True)
-    y_tf = zeros(t.shape)
-    for index in range(t.shape[0]):
-        y_tf[index] = tf.integrate(t[index], u[index])
-#    from matplotlib import pyplot
-#    pyplot.plot(y_scipy)
-#    pyplot.plot(y_tf)
-#    pyplot.show()
-    assert (absolute(y_tf-y_scipy)<0.1).all()
     
 
 def test_PIDController_P():
@@ -231,29 +213,34 @@ def test_PIDController_clamp():
 def test_PIDController():
     """Test of PIDController Class
     """
-    mdl = TransferFunction([1.0], [1.0,0.2,1.0])
-    pid = PIDController(kp=2.000, ki=0.1, kd=0.0, kn=0.1)
+    tf = TransferFunction([1.0], [1.0,10.0,20.0])
+    pid = PIDController(kp=30, ki=70.0, kd=1.0, kn=1.0)
     pid.start()
-    
-    y = list()
-    t = list()
-    u = list()
-    u.append(0.0)
+    y, u = zeros(900, 'float32'), 0.0
     start = time()
-    while True:
-        t.append(time()-start)
-        y.append(mdl.step(t[-1], u[-1]+1.0))
-        u.append(pid.update(-y[-1]))
+    for index in range(y.size):
+        t = time() - start
+        y[index] = tf.step(t, u)
+        u = pid.update(1-y[index])
         sleep(0.001)
-        if t[-1] > 4.0:
-            break
     pid.stop()
     pid.join()
-#    scipy_tf = lti([1.0], [1.0,0.2,1.0])
-#    u = ones(len(t))
-#    _, y, _ = lsim2(scipy_tf, u, t)
+    assert (absolute(y[-10:] - 1.0) < 0.01).all()
+    
+    
+def test_tunePID():
+    """Test of tunePID Method
+    """
+    t = linspace(0,10,101)
+    tf = TransferFunction([1.0], [1.0,10.0,20.0])
+    pid = PIDController(kp=30, ki=70.0, kd=0.0, kn=0.0)
+    pid = tunePID(pid, tf)
+    y, u = zeros(101, 'float32'), 0.0
+    for index in range(1,  t.size):
+        y[index] = tf.step(t[index], u)
+        dt = t[index] - t[index-1]
+        u = pid.step(dt, 1.0-y[index])
+    
     from matplotlib import pyplot
-    pyplot.plot(t, y)
-#    pyplot.plot(t, u[:-1])
+    pyplot.plot(y)
     pyplot.show()
-    assert (absolute(y[-10:]) < 0.01).all()
