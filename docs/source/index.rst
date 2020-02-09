@@ -1,20 +1,21 @@
-.. ddcontrol documentation master file, created by
-   sphinx-quickstart on Wed Feb  5 19:55:49 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Welcome to ddcontrol's documentation!
-=====================================
-
+Documentation for the Code
+**************************
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+TeacherAPI main
+===================
+.. automodule:: ddcontrol.control
+   :members:
 
+TeacherAPI controller
+=====================
+.. automodule:: ddcontrol.model
+   :members:
 
-Indices and tables
-==================
+TeacherAPI models
+=================
+.. automodule:: ddcontrol.integrate
+   :members:
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
