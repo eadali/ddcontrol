@@ -1,21 +1,38 @@
-Documentation for the Code
-**************************
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-TeacherAPI main
-===================
-.. automodule:: ddcontrol.control
-   :members:
-
-TeacherAPI controller
-=====================
-.. automodule:: ddcontrol.model
-   :members:
-
-TeacherAPI models
+ddcontrol package
 =================
-.. automodule:: ddcontrol.integrate
-   :members:
 
+Submodules
+----------
+
+ddcontrol\.control module
+-------------------------
+
+.. automodule:: ddcontrol.control
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+ddcontrol\.integrate module
+---------------------------
+
+.. automodule:: ddcontrol.integrate
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+ddcontrol\.model module
+-----------------------
+
+.. automodule:: ddcontrol.model
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: ddcontrol
+    :members:
+    :undoc-members:
+    :show-inheritance:
