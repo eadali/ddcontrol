@@ -12,6 +12,14 @@ ddcontrol\.control module
     :undoc-members:
     :show-inheritance:
 
+ddcontrol\.model module
+-----------------------
+
+.. automodule:: ddcontrol.model
+    :members:
+    :undoc-members:
+    :show-inheritance:    
+
 ddcontrol\.integrate module
 ---------------------------
 
@@ -19,15 +27,6 @@ ddcontrol\.integrate module
     :members:
     :undoc-members:
     :show-inheritance:
-
-ddcontrol\.model module
------------------------
-
-.. automodule:: ddcontrol.model
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 Module contents
 ---------------
