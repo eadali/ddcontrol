@@ -68,8 +68,8 @@ class DDE(ode):
     Thanks to http://zulko.github.io/
     
     Args:
-        f (callable, f(t, y, *f_args)): Right-hand side of the differential equation.
-        jac (callable, jac(t, y, *jac_args), optional): Jacobian of the right-hand side.
+        f (callable): Right-hand side of the differential equation.
+        jac (callable, optional): Jacobian of the right-hand side.
     """
     def __init__(self, f, jac=None):
         w = lambda t, y, args: array(f(t, self.cint, *args), 'float32')
@@ -100,7 +100,7 @@ class DDE(ode):
             This parameter is provided in order to expose internals of
             the implementation, and should not be changed from its default
             value in most cases.
-        relax (bool): If True and if the integrator supports the run_relax method,
+            relax (bool): If True and if the integrator supports the run_relax method,
             then integrate until t_1 >= t and return. ``relax`` is not
             referenced if ``step=True``.
             This parameter is provided in order to expose internals of
