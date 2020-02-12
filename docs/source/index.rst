@@ -84,8 +84,6 @@ Installation
 To install using pip
 
     pip install ddcontrol
-    
-
 
 
 ddcontrol\.control module
