@@ -6,10 +6,10 @@ The PID controller design based entirely on experimental data collected from the
 Simple PID Example
 -------------------------
     $ python  
-    >> from ddcontrol.model import TransferFunction  
-    >> from ddcontrol.control import PIDController  
-    >> import numpy as np  
-    >> import matplotlib.pyplot as plt  
+    >> from ddcontrol.model import TransferFunction;
+    >> from ddcontrol.control import PIDController;
+    >> import numpy as np;
+    >> import matplotlib.pyplot as plt;  
     >> import time  
 
 >> #Creates PID controller and test model
