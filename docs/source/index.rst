@@ -83,9 +83,8 @@ To install using pip
 
 Documentation for the Code
 **************************
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+.. contents:: Table of Contents
+   :depth: 2
 
 ddcontrol\.control module
 -------------------------
