@@ -5,7 +5,7 @@ The PID controller design based entirely on experimental data collected from the
 
 Simple PID Example
 -------------------------
-```python
+``
 from ddcontrol.model import TransferFunction
 from ddcontrol.control import PIDController
 import numpy as np
@@ -36,7 +36,7 @@ fig, ax = plt.subplots()
 ax.plot(y)
 ax.grid()
 plt.show()
-```
+``
 
 Simple PID optimization
 -------------------------
