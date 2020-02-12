@@ -1,3 +1,7 @@
+.. image:: https://readthedocs.org/projects/ddcontrol/badge/?version=latest
+:target: https://ddcontrol.readthedocs.io/en/latest/?badge=latest
+:alt: Documentation Status
+
 # Data-Driven Control
 Control Theory for humans.  
 The PID controller design based entirely on experimental data collected from the plant.
