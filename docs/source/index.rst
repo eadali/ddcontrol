@@ -3,7 +3,12 @@ Data-Driven Control
 Control Theory for humans.  
 The PID controller design based entirely on experimental data collected from the plant.
 
-
+Table of Contents
+**************************
+.. contents:: 
+   :depth: 2
+   
+   
 Simple PID Example
 -------------------------
 .. code-block:: python
@@ -81,10 +86,7 @@ To install using pip
     pip install ddcontrol
     
 
-Documentation for the Code
-**************************
-.. contents:: Table of Contents
-   :depth: 2
+
 
 ddcontrol\.control module
 -------------------------
