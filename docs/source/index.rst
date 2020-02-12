@@ -77,8 +77,8 @@ Simple Transfer Function Estimation
 Installation
 -------------------------
 To install using pip 
-    .. code-block:: python
-        pip install ddcontrol
+.. code-block:: python
+    pip install ddcontrol
 
 Documentation for the Code
 **************************
