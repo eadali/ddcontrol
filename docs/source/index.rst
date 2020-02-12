@@ -80,6 +80,7 @@ To install using pip
 .. code-block:: python
 
     pip install ddcontrol
+    
 
 Documentation for the Code
 **************************
