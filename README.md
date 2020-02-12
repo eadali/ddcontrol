@@ -4,76 +4,72 @@ The PID controller design based entirely on experimental data collected from the
 
 ## Simple PID Example
 ```python
-from ddcontrol import PIDController, MSDModel
-from time import sleep
+from ddcontrol.model import TransferFunction
+from ddcontrol.control import PIDController
+import numpy as np
+import matplotlib.pyplot as plt
+import time
 
 #Creates PID controller and test model
-pid = PIDController(8.0, 0.01, 8.0, 10.0)
-mdl = MSDModel(1.0, 1.0, 0.2, [0.4, 0.0])
+tf = TransferFunction([1.0], [1.0,10.0,20.0])
+pid = PIDController(kp=30, ki=70.0, kd=0.0, kn=0.0)
+ref = 1.0
 
 #Control loop
 pid.start()
-u_control = 0.0
-print('Press ctrl-c to break loop')
-while True:
-    try:
-        y_meas = mdl.update(u_control)
-        u_control = pid.update(-y_meas)
-        sleep(0.01)
-    except KeyboardInterrupt:
-        break
-    except Exception as msg:
-        print(msg)
+y, u = np.zeros(900), 0.0
+start = time.time()
+for index in range(y.size):
+    t = time.time() - start
+    y[index] = tf.step(t, u)
+    u = pid.update(ref-y[index])
+    time.sleep(0.001)
 
 #Stops PID controller
 pid.stop()
 pid.join()
+
+#Plots result
+fig, ax = plt.subplots()
+ax.plot(y)
+ax.grid()
+plt.show()
 ```
 
-## PID controller
+## Simple PID optimization
 ```python
-class ddcontrol.PIDController(kp, ki, kd, kn, freq=10, lmin=-inf, lmax=+inf):
+from ddcontrol.model import TransferFunction
+from ddcontrol.control import pidopt
+
+#Creates transfer function
+tf = TransferFunction([1.0], [1.0,10.0,20.0])
+
+#Predicts transfer function
+pid, _ = pidopt(tf)
+print('Optimized PID gains..:', pid.kp, pid.ki, pid.kd, pid.kn)
 ```
-A proportional–integral–derivative controller (PID controller or three-term controller)
-is a control loop mechanism employing feedback that is widely used in industrial control systems
-and a variety of other applications requiring continuously modulated control[wikipedia.org].  
-Mathematical equation of PID controller:  
-<img src="https://latex.codecogs.com/gif.latex?u(t)&space;=&space;K_p&space;e(t)&space;&plus;&space;K_i&space;\int_{0}^{t}&space;e(t)&space;&plus;&space;\delta(t)" title="u(t) = K_p e(t) + K_i \int_{0}^{t} e(t) + \delta(t)" />  
-<img src="https://latex.codecogs.com/gif.latex?\delta(t)&space;=&space;N&space;(K_d&space;e(t)-\int_{0}^{t}&space;\delta(t))" title="\delta(t) = N (K_d e(t)-\int_{0}^{t} \delta(t))" />
 
-**Parameters**  
-&nbsp;**kp : float**  
-&nbsp;&nbsp;&nbsp;Proportional gain of controller  
+## Simple Transfer Function Estimation
+```python
+from ddcontrol.model import TransferFunction, tfest
+import numpy as np
 
-&nbsp;**ki : float**  
-&nbsp;&nbsp;&nbsp;Integral gain of controller  
+#Creates a transfer function and input output data
+tf = TransferFunction([1.0], [1.0,10.0,20.0])
+t, y, u = np.linspace(0,10,101), np.zeros(101), np.ones(101)
+for index in range(t.size):
+    y[index] = tf.step(t[index], u[index])
 
-&nbsp;**kd : float**  
-&nbsp;&nbsp;&nbsp;Derivative gain of controller  
+#Predicts transfer function
+tf, _ = tfest(t, y, u, np=2, nz=0)
+print('Transfer function numerator coeffs..:', tf.num)
+print('Transfer function denumerator coeffs..:', tf.den)
+```
 
-&nbsp;**kn : float**  
-&nbsp;&nbsp;&nbsp;Derivative filter gain of controller  
-
-&nbsp;**freq : float (default=10)**  
-&nbsp;&nbsp;&nbsp;Frequency for controller  
-
-&nbsp;**lmin : float (default=numpy.inf)**  
-&nbsp;&nbsp;&nbsp;Lower limit for controller output  
-
-&nbsp;**lmax : float (default=-numpy.inf)**  
-&nbsp;&nbsp;&nbsp;Higher limit for controller output  
-
-**Methods**  
-&nbsp;**start(self) -> None**  
-&nbsp;&nbsp;&nbsp;Starts PID controller thread  
-
-&nbsp;**stop(self) -> None**  
-&nbsp;&nbsp;&nbsp;Stops PID controller thread  
-
-&nbsp;**update(self, err) -> u_control**  
-&nbsp;&nbsp;&nbsp;Updates PID controller error signal value and returns control signal value
-
+## Installation
+To install using pip:
+  pip install ddcontrol
 
 ## Roadmap
-- Real time PID controller tuning
-- Real time frequency response analysis  
+- tfest and pidopt functions are very slow. Performance improvement.
+- Real time PID controller tuning.

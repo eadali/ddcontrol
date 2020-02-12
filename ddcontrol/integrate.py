@@ -65,8 +65,7 @@ class CInterp1d:
 
 class DDE(ode):
     """A interface to to numeric integrator for Delay Differential Equations.
-    For more detail: 
-    Thanks to http://zulko.github.io/
+    For more detail: Thanks to http://zulko.github.io/
     
     Args:
         f (callable): Right-hand side of the differential equation.

@@ -9,14 +9,14 @@ from distutils.core import setup
 setup(
   name = 'ddcontrol',
   packages = ['ddcontrol'],
-  version = '0.3',
+  version = '0.5',
   license='MIT',
   description = 'The design of the PID controller is based entirely on experimental data collected from the plant',
   author = 'Erkan ADALI',
   author_email = 'erkanadali91@gmail.com',
   url = 'https://github.com/eadali/ddcontrol',
-  download_url = 'https://github.com/eadali/ddcontrol/archive/v0.3.tar.gz',
-  keywords = ['data', 'driven', 'control', 'theory' 'pid', 'tune', 'real time',],
+  download_url = 'https://github.com/eadali/ddcontrol/archive/v0.5.tar.gz',
+  keywords = ['data', 'driven', 'control', 'theory' 'pid', 'tune', 'real', 'time', 'optimize',],
   install_requires=['numpy', 'scipy',],
   classifiers=[
     'Development Status :: 3 - Alpha',

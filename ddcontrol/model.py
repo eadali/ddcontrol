@@ -85,6 +85,7 @@ class StateSpace:
         dxdt = (self.A*xd).sum(axis=(0,2)) + (self.B*ud).sum(axis=(0,2))
         return dxdt
 
+
     ##TODO: find a clean solution for xd and ud
     def step(self, t, u):
         """Find dxdy = Ax + Bu, set x as an initial condition, 
@@ -125,6 +126,8 @@ class TransferFunction(StateSpace):
         udelay (float, optional): Input delay value
     """
     def __init__(self, num, den, udelay=None):
+        self.num, self.den = num, den
+        self.udelay = udelay
         #Creates state space matrices
         A, B, C, D = tf2ss(num, den)
         if udelay is not None:
@@ -159,6 +162,7 @@ class TransferFunction(StateSpace):
 
 def tfest(t, y, u, np, nz=None, delay=False, xtol=1e-4, epsfcn=1e-4):
     """Estimates a continuous-time transfer function.
+    
     Args:
         t (float): The independent time variable where the data is measured.
         y (float): The dependent output data.
@@ -169,12 +173,28 @@ def tfest(t, y, u, np, nz=None, delay=False, xtol=1e-4, epsfcn=1e-4):
         xtol (float, optional): Relative error desired in the approximate solution.
         epsfcn (float, optional): A variable used in determining a suitable step length for
         the forward- difference approximation of the Jacobian
-     
-     Todo:
-        Optimization is very slow. Improve performance.
-        .remove tf from mdl function
+
     Returns:
-        TransferFunction: Estimated TransferFunction
+        tuple: Estimated TransferFunction and covariance ndarray
+        
+    Example:
+        >>> from ddcontrol.model import TransferFunction, tfest
+        >>> import numpy as np
+
+        >>> #Creates a transfer function and input output data
+        >>> tf = TransferFunction([1.0], [1.0,10.0,20.0])
+        >>> t, y, u = np.linspace(0,10,101), np.zeros(101), np.ones(101)
+        >>> for index in range(t.size):
+        >>>     y[index] = tf.step(t[index], u[index])
+        
+        >>> #Predicts transfer function
+        >>> tf, _ = tfest(t, y, u, np=2, nz=0)
+        >>> print('Transfer function numerator coeffs..:', tf.num)
+        >>> print('Transfer function denumerator coeffs..:', tf.den)
+    
+    Todo:
+        Optimization is very slow. Improve performance.
+        remove tf from mdl function
     """
     #Timestamps start from zero
     t -= t.min()

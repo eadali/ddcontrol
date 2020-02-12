@@ -15,43 +15,44 @@ class PIDController(Thread):
     """Advenced PID controller interface.
     
     Args:
-        kp (float): Proportional gain of controller
-        ki (float): Integral gain of controller
-        kd (float): Derivative gain of controller
-        kn (float): Filter coefficient of controller
-        freq(float, optional): PID controller calculation frequency
-        lmin, lmax (float, optional): PID controller output limits
+        kp (float): Proportional gain of controller.
+        ki (float): Integral gain of controller.
+        kd (float): Derivative gain of controller.
+        kn (float): Filter coefficient of controller.
+        freq(float, optional): PID controller calculation frequency.
+        lmin, lmax (float, optional): PID controller output limits.
         
         
     Example:
-        >>> from ddcontrol.control import PIDController
         >>> from ddcontrol.model import TransferFunction
+        >>> from ddcontrol.control import PIDController
         >>> import numpy as np
-        >>> from matplotlib import pyplot as plt
+        >>> import matplotlib.pyplot as plt
         >>> import time
         
-        >>> #Creates and starts PID controller
-        >>> pid = PIDController(kp=30, ki=70.0, kd=1.0, kn=1.0)
-        >>> pid.start()
-        
-        >>> #Creates transfer function model
-        >>> mdl = TransferFunction([1.0], [1.0,10.0,20.0])
-        >>> y, u = np.zeros(900, 'float32'), 0.0
+        >>> #Creates PID controller and test model
+        >>> tf = TransferFunction([1.0], [1.0,10.0,20.0])
+        >>> pid = PIDController(kp=30, ki=70.0, kd=0.0, kn=0.0)
+        >>> ref = 1.0
         
         >>> #Control loop
+        >>> pid.start()
+        >>> y, u = np.zeros(900), 0.0
         >>> start = time.time()
         >>> for index in range(y.size):
         >>>     t = time.time() - start
-        >>>     y[index] = mdl.step(t, u)
-        >>>     u = pid.update(1-y[index])
+        >>>     y[index] = tf.step(t, u)
+        >>>     u = pid.update(ref-y[index])
         >>>     time.sleep(0.001)
         
         >>> #Stops PID controller
-        >>> pid.stop()
+        >>> .stop()
         >>> pid.join()
         
-        >>> #Plots model output
-        >>> plt.plot(y)
+        >>> #Plots result
+        >>> fig, ax = plt.subplots()
+        >>> ax.plot(y)
+        >>> ax.grid()
         >>> plt.show()
     """    
     def __init__(self, kp, ki, kd, kn, freq=10.0, lmin=-float('Inf'), lmax=float('Inf')):
@@ -62,7 +63,7 @@ class PIDController(Thread):
         self.kp, self.ki, self.kd, self.kn = kp, ki, kd, kn
         #Other parameters
         self.freq, self.lmin, self.lmax = freq, lmin, lmax
-        self.reset()
+        self.set_initial_value()
         
         
     def __sign(self, x):
@@ -96,11 +97,11 @@ class PIDController(Thread):
         up = self.kp * e
         # Calculates integral term
         if not self.windup:
-            self.int += self.ki * e * dt
-        ui = self.int
+            self.integ += self.ki * e * dt
+        ui = self.integ
         # Calculates derivative term
-        ud = self.kn * (self.kd * e - self.fint)
-        self.fint += ud * dt
+        ud = self.kn * (self.kd * e - self.finteg)
+        self.finteg += ud * dt
         #Anti-windup
         u = up + ui + ud
         self.windup = False
@@ -125,11 +126,11 @@ class PIDController(Thread):
         return self.u
 
     
-    def reset(self):
+    def set_initial_value(self, integ=0.0, finteg=0.0):
         """Resets PID controller state.
         """
         #Integral value of integral term and derivative term
-        self.int, self.fint = 0.0, 0.0
+        self.integ, self.finteg = integ, finteg
         #Error and control signal value
         self.e, self.u = 0.0, 0.0
         #Previously measured timestamp
@@ -169,6 +170,7 @@ from numpy import  zeros, arange, inf, isnan, diff, exp, square
 
 def pidopt(tf, end=10.0, wd=0.5, k0=(0.0,0.0,0.0,0.0), freq=10.0, lim=(-float('Inf'),float('Inf'))):
     """PID optimization function for given transfer function
+    
     Args:
         tf (TransferFunction): TransferFunction object for optimization.
         end (float, optional): Optimization end time
@@ -176,12 +178,26 @@ def pidopt(tf, end=10.0, wd=0.5, k0=(0.0,0.0,0.0,0.0), freq=10.0, lim=(-float('I
         k0 (tuple, optional): Initial PID controller gains.
         freq (float, optional): PID controller frequency.
         lim (tuple, optional): Output limit values of PID controller
+        
+    Returns:
+        tuple: Optimized PIDController and OptimizeResult.
+        
+    Example:
+        >>> from ddcontrol.model import TransferFunction
+        >>> from ddcontrol.control import pidopt
+        
+        >>> #Creates transfer function
+        >>> tf = TransferFunction([1.0], [1.0,10.0,20.0])
+        
+        >>> #Predicts transfer function
+        >>> pid, _ = pidopt(tf)
+        >>> print('Optimized PID gains..:', pid.kp, pid.ki, pid.kd, pid.kn)
     
     Todo:
         Optimization is very slow. Improve performance
     """
     #Creates timestamps and time ranges
-    dt = 1.0/freq
+    dt = 1.0 / freq
     t = arange(0, 2*end, dt)
     #Creates input, output and disturbance arrays
     y, u, d = zeros(t.size, 'float32'), zeros(t.size, 'float32'), zeros(t.size, 'float32')
@@ -213,8 +229,8 @@ def pidopt(tf, end=10.0, wd=0.5, k0=(0.0,0.0,0.0,0.0), freq=10.0, lim=(-float('I
         return loss
     #Optimize pid gains
     res = minimize(objective, x0=(pid.kp, pid.ki, pid.kd, pid.kn),
-                   method='SLSQP', options={'maxiter':40,'eps':1e-2})
+                   method='SLSQP', options={'eps':1e-2})
     tf.set_initial_value()
     pid.kp, pid.ki, pid.kd, pid.kn = res.x
-    pid.reset()
+    pid.set_initial_value()
     return pid, res
