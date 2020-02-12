@@ -42,39 +42,43 @@ Simple PID Example
 
 Simple PID optimization
 -------------------------
-$ python
->> from ddcontrol.model import TransferFunction
->> from ddcontrol.control import pidopt
+.. code-block:: python
 
->> #Creates transfer function
->> tf = TransferFunction([1.0], [1.0,10.0,20.0])
-
->> #Predicts transfer function
->> pid, _ = pidopt(tf)
->> print('Optimized PID gains..:', pid.kp, pid.ki, pid.kd, pid.kn)
+    from ddcontrol.model import TransferFunction
+    from ddcontrol.control import pidopt
+    
+    #Creates transfer function
+    tf = TransferFunction([1.0], [1.0,10.0,20.0])
+    
+    #Predicts transfer function
+    pid, _ = pidopt(tf)
+    print('Optimized PID gains..:', pid.kp, pid.ki, pid.kd, pid.kn)
+    
 
 Simple Transfer Function Estimation
 -------------------------
-$ python
->> from ddcontrol.model import TransferFunction, tfest
->> import numpy as np
+.. code-block:: python
 
->> #Creates a transfer function and input output data
->> tf = TransferFunction([1.0], [1.0,10.0,20.0])
->> t, y, u = np.linspace(0,10,101), np.zeros(101), np.ones(101)
->> for index in range(t.size):
->>     y[index] = tf.step(t[index], u[index])
-
->> #Predicts transfer function
->> tf, _ = tfest(t, y, u, np=2, nz=0)
->> print('Transfer function numerator coeffs..:', tf.num)
->> print('Transfer function denumerator coeffs..:', tf.den)
+    from ddcontrol.model import TransferFunction, tfest
+    import numpy as np
+    
+    #Creates a transfer function and input output data
+    tf = TransferFunction([1.0], [1.0,10.0,20.0])
+    t, y, u = np.linspace(0,10,101), np.zeros(101), np.ones(101)
+    for index in range(t.size):
+        y[index] = tf.step(t[index], u[index])
+    
+    #Predicts transfer function
+    tf, _ = tfest(t, y, u, np=2, nz=0)
+    print('Transfer function numerator coeffs..:', tf.num)
+    print('Transfer function denumerator coeffs..:', tf.den)
 
 
 Installation
 -------------------------
-To install using pip::  
-    pip install ddcontrol
+To install using pip 
+    .. code-block:: python
+        pip install ddcontrol
 
 Documentation for the Code
 **************************
