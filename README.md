@@ -1,9 +1,7 @@
 <a href='https://ddcontrol.readthedocs.io/en/latest/?badge=latest'>
     <img src='https://readthedocs.org/projects/ddcontrol/badge/?version=latest' alt='Documentation Status' />
 </a>
-<a href='https://travis-ci.org/python-control/python-control'>
-    <img src='https://travis-ci.org/python-control/python-control.svg?branch=master', alt='Documentation Status' />
-</a>  
+
 
 # Data-Driven Control
 Control Theory for humans.  
