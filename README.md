@@ -68,7 +68,9 @@ print('Transfer function denumerator coeffs..:', tf.den)
 
 ## Installation
 To install using pip:  
-  pip install ddcontrol
+```
+pip install ddcontrol
+```
 
 ## Roadmap
 - tfest and pidopt functions are very slow. Performance improvement.
