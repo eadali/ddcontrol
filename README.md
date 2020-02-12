@@ -9,6 +9,8 @@
 Control Theory for humans.  
 The PID controller design based entirely on experimental data collected from the plant.
 
+Please Star me on GitHub for further development.
+
 ## Simple PID Example
 ```python
 from ddcontrol.model import TransferFunction
