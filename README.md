@@ -1,6 +1,6 @@
-.. image:: https://readthedocs.org/projects/ddcontrol/badge/?version=latest
-:target: https://ddcontrol.readthedocs.io/en/latest/?badge=latest
-:alt: Documentation Status
+<a href='https://ddcontrol.readthedocs.io/en/latest/?badge=latest'>
+    <img src='https://readthedocs.org/projects/ddcontrol/badge/?version=latest' alt='Documentation Status' />
+</a>
 
 # Data-Driven Control
 Control Theory for humans.  
