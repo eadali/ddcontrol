@@ -3,9 +3,11 @@ Data-Driven Control
 Control Theory for humans.  
 The PID controller design based entirely on experimental data collected from the plant.
 
+
 Simple PID Example
 -------------------------
-``
+.. code-block:: python
+
     from ddcontrol.model import TransferFunction
     from ddcontrol.control import PIDController
     import numpy as np
@@ -36,7 +38,7 @@ Simple PID Example
     ax.plot(y)
     ax.grid()
     plt.show()
-``
+
 
 Simple PID optimization
 -------------------------
