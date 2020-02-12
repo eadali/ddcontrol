@@ -1,7 +1,9 @@
 <a href='https://ddcontrol.readthedocs.io/en/latest/?badge=latest'>
     <img src='https://readthedocs.org/projects/ddcontrol/badge/?version=latest' alt='Documentation Status' />
 </a>
-
+<a href='https://travis-ci.com/eadali/ddcontrol'>
+    <img src='https://travis-ci.com/eadali/ddcontrol.svg?branch=master' alt='Build Status' />
+</a>  
 
 # Data-Driven Control
 Control Theory for humans.  
