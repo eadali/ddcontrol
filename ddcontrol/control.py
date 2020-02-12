@@ -12,17 +12,49 @@ from threading import Thread, Event
 
 
 class PIDController(Thread):
-    def __init__(self, kp, ki, kd, kn, freq=10.0, lmin=-float('Inf'), lmax=float('Inf')):
-        """Advenced PID controller interface
+    """Advenced PID controller interface.
+    
+    Args:
+        kp (float): Proportional gain of controller
+        ki (float): Integral gain of controller
+        kd (float): Derivative gain of controller
+        kn (float): Filter coefficient of controller
+        freq(float, optional): PID controller calculation frequency
+        lmin, lmax (float, optional): PID controller output limits
         
-        Args:
-            kp (float): Proportional gain of controller
-            ki (float): Integral gain of controller
-            kd (float): Derivative gain of controller
-            kn (float):
-            freq(float, optional): 
-            lmin, lmax (float, optional):
-        """
+        
+    Example:
+        >>> from ddcontrol.control import PIDController
+        >>> from ddcontrol.model import TransferFunction
+        >>> import numpy as np
+        >>> from matplotlib import pyplot as plt
+        >>> import time
+        
+        >>> #Creates and starts PID controller
+        >>> pid = PIDController(kp=30, ki=70.0, kd=1.0, kn=1.0)
+        >>> pid.start()
+        
+        >>> #Creates transfer function model
+        >>> mdl = TransferFunction([1.0], [1.0,10.0,20.0])
+        >>> y, u = np.zeros(900, 'float32'), 0.0
+        
+        >>> #Control loop
+        >>> start = time.time()
+        >>> for index in range(y.size):
+        >>>     t = time.time() - start
+        >>>     y[index] = mdl.step(t, u)
+        >>>     u = pid.update(1-y[index])
+        >>>     time.sleep(0.001)
+        
+        >>> #Stops PID controller
+        >>> pid.stop()
+        >>> pid.join()
+        
+        >>> #Plots model output
+        >>> plt.plot(y)
+        >>> plt.show()
+    """    
+    def __init__(self, kp, ki, kd, kn, freq=10.0, lmin=-float('Inf'), lmax=float('Inf')):
         Thread.__init__(self)
         #Stop event for thread
         self.sflag = Event()
@@ -94,7 +126,7 @@ class PIDController(Thread):
 
     
     def reset(self):
-        """Reset PID controller object.
+        """Resets PID controller state.
         """
         #Integral value of integral term and derivative term
         self.int, self.fint = 0.0, 0.0
@@ -122,7 +154,7 @@ class PIDController(Thread):
 
 
     def stop(self):
-        """Stops thread
+        """Stops PID controller thread
         """
         warn('bele vaziyyetin icine soxum.', RuntimeWarning)
         self.sflag.set()
@@ -131,25 +163,58 @@ class PIDController(Thread):
 
 
 from scipy.optimize import minimize
-from numpy import linspace, zeros, sin
-from numpy.linalg import norm
+from numpy import  zeros, arange, inf, isnan, diff, exp, square
    
 
-     
-def tunePID(pid, tf, order=2, ugain=0.1, tspace=(10.0,101)):
-    t = linspace(0.0, tspace[0], tspace[1])
-    y, u = zeros(tspace[1], 'float32'), zeros(tspace[1], 'float32')
-    d = zeros(101) + 1
-    def f(k):
+
+def pidopt(tf, end=10.0, wd=0.5, k0=(0.0,0.0,0.0,0.0), freq=10.0, lim=(-float('Inf'),float('Inf'))):
+    """PID optimization function for given transfer function
+    Args:
+        tf (TransferFunction): TransferFunction object for optimization.
+        end (float, optional): Optimization end time
+        wd (float, optional): Disturbance loss weight [0,1].
+        k0 (tuple, optional): Initial PID controller gains.
+        freq (float, optional): PID controller frequency.
+        lim (tuple, optional): Output limit values of PID controller
+    
+    Todo:
+        Optimization is very slow. Improve performance
+    """
+    #Creates timestamps and time ranges
+    dt = 1.0/freq
+    t = arange(0, 2*end, dt)
+    #Creates input, output and disturbance arrays
+    y, u, d = zeros(t.size, 'float32'), zeros(t.size, 'float32'), zeros(t.size, 'float32')
+    split = int(0.5 * t.size)
+    srange = int(t.size * 0.05)
+    d[split:] = 1.0
+    #Objective function for pid gains
+    pid = PIDController(kp=k0[0], ki=k0[1], kd=k0[2], kn=k0[3], freq=freq, lmin=lim[0], lmax=lim[1])
+    def objective(k):
+        #Initializes controller
         pid.kp, pid.ki, pid.kd, pid.kn = k
-        pid.reset()
         tf.set_initial_value()
-        y[:], u[:] = 0.0, 0.0
-        for index in range(1,t.size):
-            y[index] = tf.step(t[index], u[index]+d[index])
-            u[index] = pid.step(t[index]-t[index-1], y[index])
-        return (1.0-ugain)*norm(y,order) + ugain*norm(u,order)
-    k0 = (pid.kp, pid.ki, pid.kd, pid.kn)
-    res = minimize(f, x0=k0, method='Powell')
+        pid.set_initial_value()
+        #Control loop
+        for index in range(1, t.size):
+            y[index] = tf.step(t[index], u[index-1]+d[index])
+            u[index] = pid.step(dt, 1.0-y[index])
+        #If the signals contains nan, loss is infinite
+        if isnan(y).any() or isnan(u).any():
+            return inf
+        #Calculates stability loss
+        sloss = square(diff(y[split-srange:split])).mean()
+        sloss += square(diff(y[split:split+srange])).mean()
+        #Calculates tracking loss
+        tloss = square(1.0-y[:split]).mean()
+        #Calculates disturbance loss
+        dloss = square(1.0-y[split:]).mean()
+        loss = exp(sloss) + 100*(1-wd)*tloss + 100*wd*dloss
+        return loss
+    #Optimize pid gains
+    res = minimize(objective, x0=(pid.kp, pid.ki, pid.kd, pid.kn),
+                   method='SLSQP', options={'maxiter':40,'eps':1e-2})
+    tf.set_initial_value()
     pid.kp, pid.ki, pid.kd, pid.kn = res.x
-    return pid
+    pid.reset()
+    return pid, res

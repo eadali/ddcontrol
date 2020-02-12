@@ -36,7 +36,7 @@ class CInterp1d:
         """Returns a value defined as y=g(x) if x<x0, else interpolate(x)
             
         Args: 
-            x (float): xx
+            x (float): Input value
         
         Returns:
             float: Conditional interpolate value
@@ -65,6 +65,7 @@ class CInterp1d:
 
 class DDE(ode):
     """A interface to to numeric integrator for Delay Differential Equations.
+    For more detail: 
     Thanks to http://zulko.github.io/
     
     Args:
@@ -81,7 +82,7 @@ class DDE(ode):
         """Sets initial conditions 
         
         Args:
-            g (callable, g(x)): A python function or method for t<t0.
+            g (callable): A python function or method for t<t0.
             t0 (float, optional): Time value for condition
         """
         self.t0 = t0

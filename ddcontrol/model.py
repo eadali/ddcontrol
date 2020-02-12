@@ -155,20 +155,24 @@ class TransferFunction(StateSpace):
     def to_ss(self):
         pass
 
-##TODO: Function is very slow. improve
-def tfest(t, y, u, np, nz=None, delay=False, epsfcn=1e-5):
+
+
+def tfest(t, y, u, np, nz=None, delay=False, xtol=1e-4, epsfcn=1e-4):
     """Estimates a continuous-time transfer function.
-    
     Args:
         t (float): The independent time variable where the data is measured.
-        y (float): The dependent output data,
-        u (float): The dependent input data,
-        np (float): Number of poles
-        nz (float, optional): Number of zeros
-        delay (bool, optional): Status of input delay
-        epsfcn (float): A variable used in determining a suitable step length for
-        the forward- difference approximation of the Jacobian 
-        
+        y (float): The dependent output data.
+        u (float): The dependent input data.
+        np (float): Number of poles.
+        nz (float, optional): Number of zeros.
+        delay (bool, optional): Status of input delay.
+        xtol (float, optional): Relative error desired in the approximate solution.
+        epsfcn (float, optional): A variable used in determining a suitable step length for
+        the forward- difference approximation of the Jacobian
+     
+     Todo:
+        Optimization is very slow. Improve performance.
+        .remove tf from mdl function
     Returns:
         TransferFunction: Estimated TransferFunction
     """
@@ -187,15 +191,15 @@ def tfest(t, y, u, np, nz=None, delay=False, epsfcn=1e-5):
         udelay = p[(nz+1)+(np+1)] if delay else None
         return p[0:(nz+1)], p[(nz+1):(nz+1)+(np+1)], udelay
     #Model for optimization
-    def mdl(_, *p):
+    _y = zeros((t.shape[0]), 'float32')
+    def mdl(_u, *p):
         num, den, udelay = _reshape(p, nz, np, delay)
         tf = TransferFunction(num, den, udelay)
-        _y = zeros((t.shape[0]), 'float32')
         for index in range(t.shape[0]):
             _y[index] = tf.step(t[index], u[index])
         return _y
     #Optimizes the transfer function gains
-    popt, pcov = curve_fit(mdl, u, y, p0, epsfcn=epsfcn)
+    popt, pcov = curve_fit(mdl, u, y, p0, xtol=xtol, epsfcn=epsfcn)
     #Creates num, den and delay values
     num, den, udelay = _reshape(popt, nz, np, delay)
-    return (TransferFunction(num, den, udelay), pcov)
+    return TransferFunction(num, den, udelay), pcov
