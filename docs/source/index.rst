@@ -4,7 +4,7 @@ Control Theory for humans.
 The PID controller design based entirely on experimental data collected from the plant.
 
 Table of Contents
-**************************
+-------------------------
 .. contents:: 
    :depth: 2
    
