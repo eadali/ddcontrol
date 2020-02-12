@@ -6,36 +6,36 @@ The PID controller design based entirely on experimental data collected from the
 Simple PID Example
 -------------------------
 ``
-from ddcontrol.model import TransferFunction
-from ddcontrol.control import PIDController
-import numpy as np
-import matplotlib.pyplot as plt
-import time
-
-#Creates PID controller and test model
-tf = TransferFunction([1.0], [1.0,10.0,20.0])
-pid = PIDController(kp=30, ki=70.0, kd=0.0, kn=0.0)
-ref = 1.0
-
-#Control loop
-pid.start()
-y, u = np.zeros(900), 0.0
-start = time.time()
-for index in range(y.size):
-    t = time.time() - start
-    y[index] = tf.step(t, u)
-    u = pid.update(ref-y[index])
-    time.sleep(0.001)
-
-#Stops PID controller
-pid.stop()
-pid.join()
-
-#Plots result
-fig, ax = plt.subplots()
-ax.plot(y)
-ax.grid()
-plt.show()
+    from ddcontrol.model import TransferFunction
+    from ddcontrol.control import PIDController
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import time
+    
+    #Creates PID controller and test model
+    tf = TransferFunction([1.0], [1.0,10.0,20.0])
+    pid = PIDController(kp=30, ki=70.0, kd=0.0, kn=0.0)
+    ref = 1.0
+    
+    #Control loop
+    pid.start()
+    y, u = np.zeros(900), 0.0
+    start = time.time()
+    for index in range(y.size):
+        t = time.time() - start
+        y[index] = tf.step(t, u)
+        u = pid.update(ref-y[index])
+        time.sleep(0.001)
+    
+    #Stops PID controller
+    pid.stop()
+    pid.join()
+    
+    #Plots result
+    fig, ax = plt.subplots()
+    ax.plot(y)
+    ax.grid()
+    plt.show()
 ``
 
 Simple PID optimization
