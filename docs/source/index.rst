@@ -111,11 +111,3 @@ ddcontrol\.integrate module
     :members:
     :undoc-members:
     :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: ddcontrol
-    :members:
-    :undoc-members:
-    :show-inheritance:
