@@ -9,7 +9,7 @@
 Control Theory for humans.  
 The PID controller design based entirely on experimental data collected from the plant.
 
-Please Star me on GitHub for further development.
+<img src='./imgs/star.png' />Please Star me on GitHub for further development.
 
 ## PID Controller Example
 PIDController class can be used directly if the controller gains are already calculated. 
