@@ -13,7 +13,7 @@ from threading import Thread, Event
 
 class PIDController(Thread):
     """Advenced PID controller interface.
-    
+
     Args:
         kp (float): Proportional gain of controller.
         ki (float): Integral gain of controller.
@@ -21,20 +21,20 @@ class PIDController(Thread):
         kn (float): Filter coefficient of controller.
         freq(float, optional): PID controller calculation frequency.
         lmin, lmax (float, optional): PID controller output limits.
-        
-        
+
+
     Example:
         >>> from ddcontrol.model import TransferFunction
         >>> from ddcontrol.control import PIDController
         >>> import numpy as np
         >>> import matplotlib.pyplot as plt
         >>> import time
-        
+
         >>> #Creates PID controller and test model
         >>> tf = TransferFunction([1.0], [1.0,10.0,20.0])
         >>> pid = PIDController(kp=30, ki=70.0, kd=0.0, kn=0.0)
         >>> ref = 1.0
-        
+
         >>> #Control loop
         >>> pid.start()
         >>> y, u = np.zeros(900), 0.0
@@ -44,17 +44,17 @@ class PIDController(Thread):
         >>>     y[index] = tf.step(t, u)
         >>>     u = pid.update(ref-y[index])
         >>>     time.sleep(0.001)
-        
+
         >>> #Stops PID controller
         >>> .stop()
         >>> pid.join()
-        
+
         >>> #Plots result
         >>> fig, ax = plt.subplots()
         >>> ax.plot(y)
         >>> ax.grid()
         >>> plt.show()
-    """    
+    """
     def __init__(self, kp, ki, kd, kn, freq=10.0, lmin=-float('Inf'), lmax=float('Inf')):
         Thread.__init__(self)
         #Stop event for thread
@@ -64,31 +64,31 @@ class PIDController(Thread):
         #Other parameters
         self.freq, self.lmin, self.lmax = freq, lmin, lmax
         self.set_initial_value()
-        
-        
+
+
     def __sign(self, x):
         if x < 0.0:
             return -1.0
         elif x > 0.0:
             return 1.0
         return 0.0
-    
-    
+
+
     def __clip(self, x, lmin, lmax):
         if x < lmin:
             return lmin
         elif x > lmax:
             return lmax
         return x
-    
-    
+
+
     def __isclose(self, x1, x2, tol=1e-15):
         return abs(x1-x2) < tol
-        
+
 
     def step(self, e, dt):
         """Calculates PID controller states and returns output of controller
-        
+
         Args:
             e (float): Input value of controller
             dt (float): Time step used for integral calculations
@@ -115,17 +115,17 @@ class PIDController(Thread):
 
     def update(self, e):
         """Updates error value of PIDController.
-        
+
         Args:
             e (float): Error signal value
-        
+
         Returns:
             float: Control signal value
         """
         self.e = e
         return self.u
 
-    
+
     def set_initial_value(self, integ=0.0, finteg=0.0):
         """Resets PID controller state.
         """
@@ -137,8 +137,8 @@ class PIDController(Thread):
         self.ptime = None
         # Anti-Wind Up status
         self.windup = False
-    
-    
+
+
     def run(self):
         #Loop for thread
         self.sflag.clear()
@@ -159,18 +159,18 @@ class PIDController(Thread):
         """
         warn('bele vaziyyetin icine soxum.', RuntimeWarning)
         self.sflag.set()
-        
+
 
 
 
 from scipy.optimize import minimize
 from numpy import  zeros, arange, inf, isnan, diff, exp, square
-   
+
 
 
 def pidopt(tf, end=10.0, wd=0.5, k0=(0.0,0.0,0.0,0.0), freq=10.0, lim=(-float('Inf'),float('Inf'))):
     """PID optimization function for given transfer function
-    
+
     Args:
         tf (TransferFunction): TransferFunction object for optimization.
         end (float, optional): Optimization end time
@@ -178,21 +178,21 @@ def pidopt(tf, end=10.0, wd=0.5, k0=(0.0,0.0,0.0,0.0), freq=10.0, lim=(-float('I
         k0 (tuple, optional): Initial PID controller gains.
         freq (float, optional): PID controller frequency.
         lim (tuple, optional): Output limit values of PID controller
-        
+
     Returns:
         tuple: Optimized PIDController and OptimizeResult.
-        
+
     Example:
         >>> from ddcontrol.model import TransferFunction
         >>> from ddcontrol.control import pidopt
-        
+
         >>> #Creates transfer function
         >>> tf = TransferFunction([1.0], [1.0,10.0,20.0])
-        
+
         >>> #Predicts transfer function
         >>> pid, _ = pidopt(tf)
         >>> print('Optimized PID gains..:', pid.kp, pid.ki, pid.kd, pid.kn)
-    
+
     Todo:
         Optimization is very slow. Improve performance
     """
@@ -225,7 +225,9 @@ def pidopt(tf, end=10.0, wd=0.5, k0=(0.0,0.0,0.0,0.0), freq=10.0, lim=(-float('I
         tloss = square(1.0-y[:split]).mean()
         #Calculates disturbance loss
         dloss = square(1.0-y[split:]).mean()
-        loss = exp(sloss) + 100*(1-wd)*tloss + 100*wd*dloss
+#        loss = exp(sloss) + 100*(1-wd)*tloss + 100*wd*
+        loss = tloss + dloss
+        print(loss)
         return loss
     #Optimize pid gains
     res = minimize(objective, x0=(pid.kp, pid.ki, pid.kd, pid.kn),
