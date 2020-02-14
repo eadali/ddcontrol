@@ -39,7 +39,6 @@ for _ in range(1000):
     history.append([t,y])
     time.sleep(0.001)
     
-
 #Stops PID controller
 pid.stop()
 pid.join()
