@@ -47,7 +47,7 @@ pid.join()
 #Plots result
 np_hist = np.array(history)
 fig, ax = plt.subplots()
-ax.plot(np_hist[:,0], np_hist[:,1], '.-')
+ax.plot(np_hist[:,0], np_hist[:,1])
 ax.grid()
 plt.show()
 ```
