@@ -12,8 +12,8 @@ The PID controller design based entirely on experimental data collected from the
 Please Star me on GitHub for further development.
 
 ## PID Controller Example
-PIDController class can be used directly if the controller gains are already calculated.  
-PIDController class is based on Thread Class. So it can be used as Tread.  
+PIDController class can be used directly if the controller gains are already calculated. 
+PIDController class is based on Thread Class. So it can be used as Tread.
 This features provides fixed PID loop frequency.  
 ```python
 from ddcontrol.model import TransferFunction
@@ -51,7 +51,7 @@ ax.plot(np_hist[:,0], np_hist[:,1], '.-')
 ax.grid()
 plt.show()
 ```
-Controlled output:
+Controlled output:  
 <img src='./imgs/output1.png' />
 
 ## PID optimization for known Transfer Function
@@ -122,7 +122,7 @@ ax.legend()
 ax.grid()
 plt.show()
 ```
-Step response of real system and estimated system:
+Step response of real system and estimated system:  
 <img src='./imgs/output3.png' />
 
 ## Installation
