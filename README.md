@@ -50,7 +50,7 @@ ax.plot(np_hist[:,0], np_hist[:,1])
 ax.grid()
 plt.show()
 ```
-Controlled output:
+Controlled output:  
 <img src='./imgs/output1.png' />
 
 ## PID optimization for known Transfer Function
