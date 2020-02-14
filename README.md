@@ -11,7 +11,7 @@ The PID controller design based entirely on experimental data collected from the
 
 Please Star me on GitHub for further development.
 
-## Simple PID Example
+## PID Controller Example
 ```python
 from ddcontrol.model import TransferFunction
 from ddcontrol.control import PIDController
@@ -20,18 +20,61 @@ import matplotlib.pyplot as plt
 import time
 
 #Creates PID controller and test model
-tf = TransferFunction([1.0], [1.0,10.0,20.0])
 pid = PIDController(kp=30, ki=70.0, kd=0.0, kn=0.0)
+ref = 1.0
+tf = TransferFunction([1.0], [1.0,10.0,20.0], udelay=0.1)
+
+#Control loop
+history = []
+u = 0.0
+pid.start()
+start = time.time()
+for _ in range(1000):
+    t = time.time() - start
+    y = tf.step(t, u)
+    u = pid.update(ref-y)
+    history.append([t,y])
+    time.sleep(0.001)
+    
+
+#Stops PID controller
+pid.stop()
+pid.join()
+
+#Plots result
+np_hist = np.array(history)
+fig, ax = plt.subplots()
+ax.plot(np_hist[:,0], np_hist[:,1], '.-')
+ax.grid()
+plt.show()
+```
+Controlled output:
+<img src='./imgs/output1.png' />
+
+## PID optimization for known Transfer Function
+```python
+from ddcontrol.model import TransferFunction
+from ddcontrol.control import pidopt
+import matplotlib.pyplot as plt
+import time
+
+#Creates transfer function
+tf = TransferFunction([1.0], [1.0,10.0,20.0], udelay=0.1)
+
+#Predicts transfer function
+pid, _ = pidopt(tf)
 ref = 1.0
 
 #Control loop
+history = []
+u = 0.0
 pid.start()
-y, u = np.zeros(900), 0.0
 start = time.time()
-for index in range(y.size):
+for _ in range(1000):
     t = time.time() - start
-    y[index] = tf.step(t, u)
-    u = pid.update(ref-y[index])
+    y = tf.step(t, u)
+    u = pid.update(ref-y)
+    history.append([t,y])
     time.sleep(0.001)
 
 #Stops PID controller
@@ -39,41 +82,43 @@ pid.stop()
 pid.join()
 
 #Plots result
+np_hist = np.array(history)
 fig, ax = plt.subplots()
-ax.plot(y)
+ax.plot(np_hist[:,0], np_hist[:,1], '.-')
 ax.grid()
 plt.show()
 ```
+Controlled output:
+<img src='./imgs/output2.png' />
 
-## Simple PID optimization
-```python
-from ddcontrol.model import TransferFunction
-from ddcontrol.control import pidopt
-
-#Creates transfer function
-tf = TransferFunction([1.0], [1.0,10.0,20.0])
-
-#Predicts transfer function
-pid, _ = pidopt(tf)
-print('Optimized PID gains..:', pid.kp, pid.ki, pid.kd, pid.kn)
-```
-
-## Simple Transfer Function Estimation
+## Transfer Function Estimation for unknown SISO system
 ```python
 from ddcontrol.model import TransferFunction, tfest
 import numpy as np
+import matplotlib.pyplot as plt
 
 #Creates a transfer function and input output data
-tf = TransferFunction([1.0], [1.0,10.0,20.0])
+tf = TransferFunction([1.0], [1.0,10.0,20.0], 1.0)
 t, y, u = np.linspace(0,10,101), np.zeros(101), np.ones(101)
 for index in range(t.size):
     y[index] = tf.step(t[index], u[index])
 
 #Predicts transfer function
-tf, _ = tfest(t, y, u, np=2, nz=0)
-print('Transfer function numerator coeffs..:', tf.num)
-print('Transfer function denumerator coeffs..:', tf.den)
+tf_est, _ = tfest(t, y, u, np=2, nz=0, delay=True)
+y_est = np.zeros(101)
+for index in range(t.size):
+    y_est[index] = tf_est.step(t[index], u[index])
+
+#Plots result
+fig, ax = plt.subplots()
+ax.plot(t, y, '.-', label='Real')
+ax.plot(t, y_est, '.-', label='Estimated')
+ax.legend()
+ax.grid()
+plt.show()
 ```
+Step response of real system and estimated system:
+<img src='./imgs/output3.png' />
 
 ## Installation
 To install using pip:  
