@@ -49,7 +49,7 @@ Table of Contents
     ax.grid()
     plt.show()
 
-.. image:: example.png ../../output1.png
+.. image:: ../../output1.png
 
 Simple PID optimization
 -------------------------
