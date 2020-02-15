@@ -89,10 +89,10 @@ pid.join()
 np_hist = np.array(history)
 fig, ax = plt.subplots()
 ax.plot(np_hist[:,0], np_hist[:,1])
-ax.grid()
+ax.grid()git 
 plt.show()
 ```
-Controlled output:
+Controlled output:  
 <img src='./imgs/output2.png' />
 
 ## Transfer Function Estimation for unknown SISO system
@@ -122,7 +122,7 @@ ax.legend()
 ax.grid()
 plt.show()
 ```
-Step response of real system and estimated system:
+Step response of real system and estimated system:  
 <img src='./imgs/output3.png' />
 
 ## Installation
