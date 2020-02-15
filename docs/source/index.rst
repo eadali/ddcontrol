@@ -65,7 +65,7 @@ PID optimization for known Transfer Function
     #Creates transfer function
     tf = TransferFunction([1.0], [1.0,10.0,20.0], udelay=0.1)
     
-    #Predicts transfer function
+    #Optimize PID controller
     pid, _ = pidopt(tf)
     ref = 1.0
     
