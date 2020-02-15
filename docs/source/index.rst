@@ -3,7 +3,8 @@ Data-Driven Control
 Control Theory for humans.  
 The PID controller design based entirely on experimental data collected from the plant.
 
-<img src='./imgs/star.png' />Please Star me on GitHub for further development.
+.. image:: ../../imgs/star.png 
+Please Star me on GitHub for further development.
 
 Table of Contents
 -------------------------
