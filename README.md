@@ -89,7 +89,7 @@ pid.join()
 np_hist = np.array(history)
 fig, ax = plt.subplots()
 ax.plot(np_hist[:,0], np_hist[:,1])
-ax.grid()git 
+ax.grid() 
 plt.show()
 ```
 Controlled output:  
