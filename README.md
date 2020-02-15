@@ -131,6 +131,12 @@ To install using pip:
 pip install ddcontrol
 ```
 
+## Documentation
+To read documentation:
+<a href='https://ddcontrol.readthedocs.io/en/latest/#'>
+https://ddcontrol.readthedocs.io/en/latest/#
+</a>
+
 ## Roadmap
 - tfest and pidopt functions are very slow. Performance improvement.
 - Real time PID controller tuning.
