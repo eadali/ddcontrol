@@ -50,6 +50,7 @@ PID Controller Example
     plt.show()
 
 Controlled output:  
+
 .. image:: ../../imgs/output1.png
 
 PID optimization for known Transfer Function
@@ -93,6 +94,7 @@ PID optimization for known Transfer Function
     plt.show()
 
 Controlled output:  
+
 .. image:: ../../imgs/output2.png 
 
 Transfer Function Estimation for unknown SISO system
@@ -124,6 +126,7 @@ Transfer Function Estimation for unknown SISO system
     plt.show()
 
 Controlled output:  
+
 .. image:: ../../imgs/output3.png 
 
 Installation
