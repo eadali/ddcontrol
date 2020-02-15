@@ -11,7 +11,7 @@ Table of Contents
    :depth: 2
    
    
-## PID Controller Example
+PID Controller Example
 -------------------------
 .. code-block:: python
 
@@ -49,9 +49,10 @@ Table of Contents
     ax.grid()
     plt.show()
 
+Controlled output:  
 .. image:: ../../imgs/output1.png
 
-Simple PID optimization
+PID optimization for known Transfer Function
 -------------------------
 .. code-block:: python
 
@@ -91,9 +92,10 @@ Simple PID optimization
     ax.grid()git 
     plt.show()
 
-<img src='./imgs/output2.png' />    
+Controlled output:  
+.. image:: ../../imgs/output2.png 
 
-Simple Transfer Function Estimation
+Transfer Function Estimation for unknown SISO system
 -------------------------
 .. code-block:: python
 
@@ -121,18 +123,14 @@ Simple Transfer Function Estimation
     ax.grid()
     plt.show()
 
-<img src='./imgs/output3.png' />    
+Controlled output:  
+.. image:: ../../imgs/output3.png 
 
 Installation
 -------------------------
 To install using pip
 
     pip install ddcontrol
-
-Documentation
--------------------------
-To read documentation:  
-https://ddcontrol.readthedocs.io/
 
 ddcontrol\.control module
 -------------------------
