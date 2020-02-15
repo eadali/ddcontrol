@@ -215,7 +215,7 @@ def pidopt(tf, end=10.0, wd=0.5, k0=(1.0,1.0,1.0,1.0), freq=10.0, lim=(-float('I
         #If the signals contains nan, loss is infinite
         if isnan(y).any() or isnan(u).any():
             return inf
-        #Calculates tracking loss
+        #Calculates loss
         loss = (t * absolute(1.0-y)).mean()
         return loss
     #Optimize pid gains

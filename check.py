@@ -7,7 +7,7 @@ Created on Fri Feb 14 17:35:00 2020
 
 from ddcontrol.model import TransferFunction
 from ddcontrol.control import pidopt
-import numpy as np
+
 import matplotlib.pyplot as plt
 import time
 
