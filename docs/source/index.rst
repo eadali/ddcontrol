@@ -6,9 +6,7 @@ The PID controller design based entirely on experimental data collected from the
 .. image:: ../../imgs/star.png 
 Please Star me on GitHub for further development.
 
-Table of Contents
--------------------------
-.. contents::
+.. contents:: Table of Contents
    :depth: 2
    
    
