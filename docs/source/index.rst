@@ -125,7 +125,7 @@ Transfer Function Estimation for unknown SISO system
     ax.grid()
     plt.show()
 
-Controlled output:  
+Step response of real system and estimated system:  
 
 .. image:: ../../imgs/output3.png 
 
