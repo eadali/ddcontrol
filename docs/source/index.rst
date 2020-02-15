@@ -11,7 +11,7 @@ Table of Contents
    :depth: 2
    
    
-Simple PID Example
+## PID Controller Example
 -------------------------
 .. code-block:: python
 
@@ -49,7 +49,7 @@ Simple PID Example
     ax.grid()
     plt.show()
 
-<img src='./imgs/output1.png' />
+.. image:: example.png ../../output1.png
 
 Simple PID optimization
 -------------------------
@@ -132,9 +132,7 @@ To install using pip
 Documentation
 -------------------------
 To read documentation:  
-<a href='https://ddcontrol.readthedocs.io/'>
 https://ddcontrol.readthedocs.io/
-</a>
 
 ddcontrol\.control module
 -------------------------
