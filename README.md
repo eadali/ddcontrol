@@ -132,9 +132,9 @@ pip install ddcontrol
 ```
 
 ## Documentation
-To read documentation:
-<a href='https://ddcontrol.readthedocs.io/en/latest/#'>
-https://ddcontrol.readthedocs.io/en/latest/#
+To read documentation:  
+<a href='https://ddcontrol.readthedocs.io/'>
+https://ddcontrol.readthedocs.io/
 </a>
 
 ## Roadmap
