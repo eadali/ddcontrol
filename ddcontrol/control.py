@@ -164,11 +164,11 @@ class PIDController(Thread):
 
 
 from scipy.optimize import minimize
-from numpy import  zeros, arange, inf, isnan, diff, exp, square, absolute
+from numpy import  zeros, arange, inf, isnan, absolute
 
 
 
-def pidopt(tf, end=10.0, k0=(1.0,1.0,1.0,1.0), freq=10.0, lim=(-float('Inf'),float('Inf'))):
+def pidopt(tf, end=10.0, wd=0.5, k0=(1.0,1.0,1.0,1.0), freq=10.0, lim=(-float('Inf'),float('Inf'))):
     """PID optimization function for given transfer function
 
     Args:
@@ -187,9 +187,9 @@ def pidopt(tf, end=10.0, k0=(1.0,1.0,1.0,1.0), freq=10.0, lim=(-float('Inf'),flo
         >>> from ddcontrol.control import pidopt
 
         >>> #Creates transfer function
-        >>> tf = TransferFunction([1.0], [1.0,10.0,20.0])
+        >>> tf = TransferFunction([1.0], [1.0,10.0,20.0], udelay=0.1)
 
-        >>> #Predicts transfer function
+        >>> #Optimizes pid controller
         >>> pid, _ = pidopt(tf)
         >>> print('Optimized PID gains..:', pid.kp, pid.ki, pid.kd, pid.kn)
 
@@ -201,29 +201,26 @@ def pidopt(tf, end=10.0, k0=(1.0,1.0,1.0,1.0), freq=10.0, lim=(-float('Inf'),flo
     t = arange(0, end, dt)
     #Creates input, output and disturbance arrays
     y, u = zeros(t.size, 'float32'), zeros(t.size, 'float32')
-    print('why not')
     #Objective function for pid gains
     pid = PIDController(kp=k0[0], ki=k0[1], kd=k0[2], kn=k0[3], freq=freq, lmin=lim[0], lmax=lim[1])
     def objective(k):
         #Initializes controller
         pid.kp, pid.ki, pid.kd, pid.kn = k
-        print(k)
         tf.set_initial_value()
         pid.set_initial_value()
         #Control loop
         for index in range(1, t.size):
-            y[index] = tf.step(t[index], u[index-1])
+            y[index] = tf.step(t[index], u[index-1]+wd)
             u[index] = pid.step(dt, 1.0-y[index])
         #If the signals contains nan, loss is infinite
         if isnan(y).any() or isnan(u).any():
             return inf
         #Calculates tracking loss
         loss = (t * absolute(1.0-y)).mean()
-        print(loss)
-        return 100*loss
+        return loss
     #Optimize pid gains
     res = minimize(objective, x0=(pid.kp, pid.ki, pid.kd, pid.kn),
-                   method='SLSQP', options={'eps':1e-2})
+                   method='SLSQP', options={'ftol':1e-4, 'eps':1e-2})
     tf.set_initial_value()
     pid.kp, pid.ki, pid.kd, pid.kn = res.x
     pid.set_initial_value()
