@@ -12,6 +12,8 @@ Please Star me on GitHub for further development.
    
 PID Controller Example
 -------------------------
+PIDController class can be used directly if the controller gains are already calculated. PIDController class is based on Thread Class. So it can be used as Tread. This features provides fixed PID loop frequency.
+
 .. code-block:: python
 
     from ddcontrol.model import TransferFunction
@@ -54,6 +56,8 @@ Controlled output:
 
 PID optimization for known Transfer Function
 -------------------------
+If the transfer function is already known, controller gains can be calculated by pidopt method.
+
 .. code-block:: python
 
     from ddcontrol.model import TransferFunction
@@ -98,6 +102,8 @@ Controlled output:
 
 Transfer Function Estimation for unknown SISO system
 -------------------------
+If the transfer function is unknown for system, the transfer function can be estimated by tfest method.
+
 .. code-block:: python
 
     from ddcontrol.model import TransferFunction, tfest
