@@ -20,7 +20,7 @@ setup(
                 'Source Code': 'https://github.com/eadali/ddcontrol',},
   download_url = 'https://github.com/eadali/ddcontrol/archive/v0.5.tar.gz',
   keywords = ['data', 'driven', 'control', 'theory' 'pid', 'tune', 'real', 'time', 'optimize',],
-  install_requires=['numpy', 'scipy',],
+  install_requires=['scipy',],
   classifiers=[
     'Development Status :: 3 - Alpha',
     'Intended Audience :: Developers',
