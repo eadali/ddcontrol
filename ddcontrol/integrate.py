@@ -11,7 +11,45 @@ from scipy.integrate import ode
 from numpy import array
 
 
+class ODE:
+    def __init__(self, f, jac=None):
+        self.f = f
+        self.jac = jac
+    
+    def set_initial_value(self, t0, y0):
+        self.t = t0
+        self.y = y0
+        
+    
+    def integrate(self, t):
+        k1 = self.f(t, y)
+        k2 = self.f(t + h/2, y + (h/2)*k1)
+        k3 = self.f(t + h/2, y + (h/2)*k2)
+        k4 = self.f(t + h/2, y + h*k3)
+        pass
+        
 
+import math
+def f(x, y):
+    return x * math.sqrt(y)
+ 
+dd = ODE(f)
+t0 = 0
+y0 = 1
+dd.set_initial_value(t0, y0)
+
+tt = []
+xx = []
+for t in range(0,100):
+    tt.append(t)
+    xx.append(dd.integrate(t))
+
+print(xx)
+
+
+
+        
+        
 class CInterp1d:
     """A conditional interpolation function interface.
 
