@@ -15,41 +15,49 @@ class ODE:
     def __init__(self, f, jac=None):
         self.f = f
         self.jac = jac
-    
+
     def set_initial_value(self, t0, y0):
         self.t = t0
         self.y = y0
-        
-    
-    def integrate(self, t):
-        k1 = self.f(t, y)
-        k2 = self.f(t + h/2, y + (h/2)*k1)
-        k3 = self.f(t + h/2, y + (h/2)*k2)
-        k4 = self.f(t + h/2, y + h*k3)
-        pass
-        
 
-import math
-def f(x, y):
-    return x * math.sqrt(y)
- 
+    def set_f_params(self):
+        pass
+
+    def integrate(self, t):
+        h = t - self.t
+
+        k1 = self.f(self.t, self.y)
+        k2 = self.f(self.t + h/2, self.y + (h/2)*k1)
+        k3 = self.f(self.t + h/2, self.y + (h/2)*k2)
+        k4 = self.f(self.t + h/2, self.y + h*k3)
+
+        self.t = self.t + h
+        self.y = self.y + (k1 + k2 + k2 + k3 + k3 + k4) / 6
+
+        return self.y
+
+
+
+
+def f(t, y):
+    return -0.1*y
+
 dd = ODE(f)
-t0 = 0
-y0 = 1
-dd.set_initial_value(t0, y0)
+dd.set_initial_value(0, 1)
 
 tt = []
 xx = []
-for t in range(0,100):
-    tt.append(t)
-    xx.append(dd.integrate(t))
+for t in range(0, 100):
+    tt.append(t/10)
+    xx.append(dd.integrate(t/10))
 
-print(xx)
+from matplotlib import pyplot
+pyplot.plot(tt,xx )
+pyplot.show()
 
 
 
-        
-        
+
 class CInterp1d:
     """A conditional interpolation function interface.
 
@@ -72,10 +80,10 @@ class CInterp1d:
 
     def __call__(self, x):
         """Returns a value defined as y=g(x) if x<x0, else interpolate(x)
-            
-        Args: 
+
+        Args:
             x (float): Input value
-        
+
         Returns:
             float: Conditional interpolate value
         """
@@ -104,7 +112,7 @@ class CInterp1d:
 class DDE(ode):
     """A interface to to numeric integrator for Delay Differential Equations.
     For more detail: Thanks to http://zulko.github.io/
-    
+
     Args:
         f (callable): Right-hand side of the differential equation.
         jac (callable, optional): Jacobian of the right-hand side.
@@ -116,8 +124,8 @@ class DDE(ode):
 
 
     def set_initial_value(self, g, t0=0.0):
-        """Sets initial conditions 
-        
+        """Sets initial conditions
+
         Args:
             g (callable): A python function or method for t<t0.
             t0 (float, optional): Time value for condition
@@ -130,7 +138,7 @@ class DDE(ode):
 
     def integrate(self, t, step=False, relax=False):
         """Find y=y(t), set y as an initial condition, and return y.
-        
+
         Args:
             t (float): The endpoint of the integration step.
             step (bool): If True, and if the integrator supports the step method,
@@ -144,7 +152,7 @@ class DDE(ode):
             This parameter is provided in order to expose internals of
             the implementation, and should not be changed from its default
             value in most cases.
-        
+
         Returns:
             float: The integrated value at t.
         """
