@@ -29,11 +29,10 @@ def test_DDE():
     """
     f = lambda t, x: [-x(t-1.0)]
     solver = DDE(f)
-    solver.set_integrator('dopri5')
     g = lambda t: [1.0]
     t = linspace(0,10,101)
     y = zeros(t.shape)
-    solver.set_initial_value(g, 0.0)
+    solver.set_initial_value(0.0, g)
     for index in range(t.shape[0]):
         y[index] = solver.integrate(t[index])
     check1 = absolute(y[0]-1.0) < 0.01
@@ -103,10 +102,9 @@ def test_StateSpace_sdelay():
     t = linspace(0,10,101)
     f = lambda t, x: [-x(t-1.0)]
     solver = DDE(f)
-    solver.set_integrator('dopri5')
     g = lambda t: [1.0]
     y_dde = zeros(t.shape)
-    solver.set_initial_value(g, 0.0)
+    solver.set_initial_value(0.0, g)
     for index in range(t.shape[0]):
         y_dde[index] = solver.integrate(t[index])
     A = [[[0.0]], [[-1.0]]]

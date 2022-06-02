@@ -7,7 +7,6 @@ Created on Thu Feb  6 22:05:52 2020
 """
 from scipy.interpolate import interp1d
 from collections import deque
-from scipy.integrate import ode
 from numpy import array, isscalar
 
 
@@ -85,7 +84,7 @@ class ODE:
 
 
 
-class DDE(ode):
+class DDE(ODE):
     """A interface to to numeric integrator for Delay Differential Equations.
     For more detail: Thanks to http://zulko.github.io/
 
@@ -93,26 +92,26 @@ class DDE(ode):
         f (callable): Right-hand side of the differential equation.
         jac (callable, optional): Jacobian of the right-hand side.
     """
-    def __init__(self, f, jac=None):
+    def __init__(self, f):
         w = lambda t, y, args: array(f(t, self.cint, *args), 'float32')
-        ode.__init__(self, w, jac)
+        ODE.__init__(self, w)
         self.set_f_params(())
 
 
-    def set_initial_value(self, g, t0=0.0):
+    def set_initial_value(self, t, g):
         """Sets initial conditions
 
         Args:
             g (callable): A python function or method for t<t0.
             t0 (float, optional): Time value for condition
         """
-        self.t0 = t0
+        self.t = t
         w = lambda t: array(g(t))
-        self.cint = CInterp1d(w, t0)
-        ode.set_initial_value(self, w(t0), t0)
+        self.cint = CInterp1d(w, t)
+        ODE.set_initial_value(self, t, w(t))
 
 
-    def integrate(self, t, step=False, relax=False):
+    def integrate(self, t):
         """Find y=y(t), set y as an initial condition, and return y.
 
         Args:
@@ -132,10 +131,10 @@ class DDE(ode):
         Returns:
             float: The integrated value at t.
         """
-        if t < self.t0:
+        if t < self.t:
             y = array(self.cint(t))
         else:
-            y = array(ode.integrate(self, t, step, relax), 'float32')
+            y = array(ODE.integrate(self, t), 'float32')
             self.cint.append(t, y)
         return y
 

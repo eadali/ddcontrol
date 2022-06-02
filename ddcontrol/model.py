@@ -40,7 +40,6 @@ class StateSpace:
             self.delays = array(delays, 'float32', copy=True)
         #Configures DDE
         self.solver = DDE(self.__ss_eq)
-        self.solver.set_integrator('dopri5')
         self.set_initial_value()
 
 
@@ -68,7 +67,7 @@ class StateSpace:
         #Creates states function
         self.x = CInterp1d(x0, 0.0)
         w = lambda t: array(x0(t), 'float32')
-        self.solver.set_initial_value(w, 0.0)
+        self.solver.set_initial_value(0.0, w)
 
 
     ##TODO: find a clean solution for xd and ud
