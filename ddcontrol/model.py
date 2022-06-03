@@ -8,7 +8,7 @@ from numpy import array, zeros, ndarray, expand_dims, stack, ones
 from numbers import Number
 from scipy.signal import tf2ss
 from scipy.optimize import curve_fit
-from ddcontrol.integrate import CInterp1d, DDE
+from ddcontrol.integrate import CInterp1d, dde
 
 
 
@@ -39,7 +39,7 @@ class StateSpace:
         elif isinstance(delays, (list,tuple)):
             self.delays = array(delays, 'float32', copy=True)
         #Configures DDE
-        self.solver = DDE(self.__ss_eq)
+        self.solver = dde(self.__ss_eq)
         self.set_initial_value()
 
 
@@ -63,9 +63,9 @@ class StateSpace:
             uc = u0.copy()
             u0 = lambda t: array(uc, 'float32', copy=True)
         #Creates input function
-        self.u = CInterp1d(u0, 0.0)
+        self.u = CInterp1d(0.0, u0)
         #Creates states function
-        self.x = CInterp1d(x0, 0.0)
+        self.x = CInterp1d(0.0, x0)
         w = lambda t: array(x0(t), 'float32')
         self.solver.set_initial_value(0.0, w)
 

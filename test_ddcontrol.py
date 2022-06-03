@@ -5,18 +5,19 @@ Created on Fri Jan 10 19:56:26 2020
 
 @author: eadali
 """
-from ddcontrol.integrate import CInterp1d, DDE
+from ddcontrol.integrate import CInterp1d, ode, dde
 from ddcontrol.model import StateSpace, TransferFunction, tfest
 from ddcontrol.control import PIDController, pidopt
-from numpy import zeros, absolute, ones, linspace, argmax
+from numpy import zeros, absolute, ones, linspace, argmax, sin, pi
 from scipy.signal import lsim2, lti
+from scipy.integrate import odeint
 from time import time, sleep
 
 
 def test_CInterp1d():
     """Test of CInterp1d Class
     """
-    f = CInterp1d(lambda x: [0.0], 0.0)
+    f = CInterp1d(0.0, lambda x: [0.0])
     f.append(1.0, [1.0])
     check1 = absolute(f(0.0)) < 1e-4
     check2 = absolute(f(0.5)-0.5) < 1e-4
@@ -24,11 +25,27 @@ def test_CInterp1d():
     assert check1 and check2 and check3
 
 
+def test_ODE():
+    """Test of ODE Class
+    """
+    pendulum = lambda t, y: [y[1], -0.25*y[1] - 5.0*sin(y[0])]
+    t = linspace(0, 10, 101)
+    y0 = [pi - 0.1, 0.0]    
+    scipy_solution = odeint(pendulum, y0, t, tfirst=True)
+    
+    solver = ode(pendulum).set_initial_value(t[0], y0).set_f_params()
+    ode_solution = zeros((t.shape[0], len(y0)))
+    for i in range(t.shape[0]):
+        ode_solution[i] = solver.integrate(t[i])
+    check = (absolute(scipy_solution-ode_solution) < 0.1).all()
+    assert check
+
+
 def test_DDE():
     """Test of DDE Class
     """
     f = lambda t, x: [-x(t-1.0)]
-    solver = DDE(f)
+    solver = dde(f)
     g = lambda t: [1.0]
     t = linspace(0,10,101)
     y = zeros(t.shape)
@@ -101,7 +118,7 @@ def test_StateSpace_sdelay():
     """
     t = linspace(0,10,101)
     f = lambda t, x: [-x(t-1.0)]
-    solver = DDE(f)
+    solver = dde(f)
     g = lambda t: [1.0]
     y_dde = zeros(t.shape)
     solver.set_initial_value(0.0, g)
