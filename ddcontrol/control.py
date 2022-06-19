@@ -162,6 +162,14 @@ class PIDController(Thread):
 
 
 
+class StanleyController:
+    pass
+
+
+
+
+
+
 
 from scipy.optimize import minimize
 from numpy import  zeros, arange, inf, isnan, absolute
