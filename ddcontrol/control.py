@@ -8,10 +8,11 @@ Created on Thu Jan  9 20:18:58 2020
 from time import time, sleep
 from warnings import warn
 from threading import Thread, Event
+from numpy import inf
 
 
 
-class PIDController(Thread):
+class PIDController:
     """Advenced PID controller interface.
 
     Args:
@@ -55,42 +56,19 @@ class PIDController(Thread):
         >>> ax.grid()
         >>> plt.show()
     """
-    def __init__(self, kp, ki, kd, kn, freq=10.0, lmin=-float('Inf'), lmax=float('Inf')):
-        Thread.__init__(self)
-        #Stop event for thread
-        self.sflag = Event()
-        # Gains
-        self.kp, self.ki, self.kd, self.kn = kp, ki, kd, kn
-        #Other parameters
-        self.freq, self.lmin, self.lmax = freq, lmin, lmax
-        self.set_initial_value()
-
-
-    def __sign(self, x):
-        if x < 0.0:
-            return -1.0
-        elif x > 0.0:
-            return 1.0
-        return 0.0
-
-
-    def __clip(self, x, lmin, lmax):
-        if x < lmin:
-            return lmin
-        elif x > lmax:
-            return lmax
-        return x
-
-
-    def __isclose(self, x1, x2, tol=1e-15):
-        return abs(x1-x2) < tol
-
-
-    def step(self, e, dt):
+    def __init__(self, Kp, Ki, Kd, Kn, output_limits=(-inf, inf)):
+        # Get PID controller gains and output limits
+        self.Kp, self.Ki, self.Kd, self.Kn = Kp, Ki, Kd, Kn
+        self.output_limits = output_limits
+    
+    def set_initial_value(T0, I0, D0):
+        self.t = T0
+        
+    def integrate(self, t, e):
         """Calculates PID controller states and returns output of controller
 
         Args:
-            e (float): Input value of controller
+            u (float): Input value of controller
             dt (float): Time step used for integral calculations
         """
         #Calculates proportional term
@@ -137,37 +115,6 @@ class PIDController(Thread):
         self.ptime = None
         # Anti-Wind Up status
         self.windup = False
-
-
-    def run(self):
-        #Loop for thread
-        self.sflag.clear()
-        while not self.sflag.is_set():
-            #Fixes frequency of controller
-            if self.ptime is not None:
-                wait = (1.0/self.freq) - (time()-self.ptime)
-                if wait > 0.0:
-                    sleep(wait)
-                else:
-                    warn('PID contoller frequency is lower than \'freq\' value.', RuntimeWarning)
-            self.ptime = time()
-            self.step(self.e, (1.0/self.freq))
-
-
-    def stop(self):
-        """Stops PID controller thread
-        """
-        warn('bele vaziyyetin icine soxum.', RuntimeWarning)
-        self.sflag.set()
-
-
-
-class StanleyController:
-    pass
-
-
-
-
 
 
 
