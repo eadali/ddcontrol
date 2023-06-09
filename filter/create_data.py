@@ -4,7 +4,9 @@ from scipy import signal
 
 t = np.linspace(0, 1, 1000, False)  # 1 second
 sig = np.sin(2*np.pi*10*t) + np.random.normal(size=t.shape)
-np.savetxt("foo.csv", sig, delimiter=",")
+data = np.stack((t,sig),axis=1)
+print(data.shape)
+np.savetxt("foo.csv", data, delimiter=",")
 
 
 fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
