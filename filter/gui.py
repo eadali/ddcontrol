@@ -13,33 +13,43 @@ from statsmodels.tsa.stattools import acovf
 t = []
 u = []
 y = []
+fs= 0
 fig = Figure(figsize=(5, 4), dpi=100)
 ax = fig.add_subplot(111)
+
+
+def slider_update(a):
+    hh.set(zz.get())
+    sos = signal.butter(10, 10, 'lp', fs=hh.get(), output='sos')
+    y = signal.sosfilt(sos, u[0])
+    ax.clear()
+    ax.plot(t[0],u[0])
+    ax.plot(t[0],y)
+    canvas.draw()
 
 def import_csv_data():
     csv_file_path = askopenfilename()
     sig = np.genfromtxt(csv_file_path, delimiter=",")
-    t = sig[:,0]
-    u = sig[:,1]
+    t.append(sig[:,0])
+    u.append(sig[:,1])
+    print(u)
 
-    c = acovf(u).max()
-    fs = 143*c
-    sos = signal.butter(10, 10, 'lp', fs=100, output='sos')
-    y = signal.sosfilt(sos, u)
-    zz.set(fs)
+    c = acovf(u[0]).max()
+    hh.set(143*c)
+    zz.set(hh.get())
+    slider_update()
 
 
-    ax.plot(t,u)
-    ax.plot(t,y)
-    canvas.draw()
+
 
 root = tk.Tk()
 N = tk.StringVar()
 zz = tk.DoubleVar()
+hh = tk.DoubleVar()
 tk.Label(root, text='The order of the filter:').grid(row=0, column=0)
 tk.Spinbox(root, from_=0, to=20, textvariable=N).grid(row=0, column=1)
 tk.Label(root, text='Normalized cutoff frequency:').grid(row=0, column=3)
-tk.Scale(root, from_=0, to=100, orient=tk.HORIZONTAL, variable=zz).grid(row=0, column=4)
+tk.Scale(root, from_=0, to=1000, orient=tk.HORIZONTAL, variable=zz, command=slider_update).grid(row=0, column=4)
 tk.Button(root, text='Show parameters').grid(row=0, column=5)
 
 
