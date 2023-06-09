@@ -34,17 +34,19 @@ import filter_design
 import numpy as np
 from scipy import signal
 from matplotlib import pyplot as plt
+from statsmodels.tsa.stattools import acovf
 
 
 
 
-data = np.loadtxt("./foo.csv", delimiter=",")
-t = data[:,0]
-sig = data[:,1]
+t = np.linspace(0, 1, 1000, False)  # 1 second
+sig = np.sin(2*np.pi*10*t) + np.random.normal(size=t.shape)
 a = filter_design.std(t, sig)
-fs = 70*a 
+c = acovf(sig).max()
+fs = 143*c
 sos = signal.butter(10, 10, 'lp', fs=100, output='sos')
 filtered = signal.sosfilt(sos, sig)
+
 
 root = tkinter.Tk()
 root.wm_title("Embedding in Tk")
